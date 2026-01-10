@@ -1,0 +1,21 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudTabs Elevation="3" Rounded="true" Centered="false" Position="Position.Bottom">
+        <MudTabPanel Icon="@Icons.Material.Filled.Dashboard" BadgeData='"Dashboard"' BadgeColor="Color.Info" />
+        <MudTabPanel Icon="@Icons.Material.Filled.Policy" BadgeData='"Policies"' />
+        <MudTabPanel Icon="@Icons.Material.Filled.AccountBalance" BadgeData='"Accounts"' BadgeColor="Color.Error" />
+        <MudTabPanel Icon="@Icons.Material.Filled.People" BadgeData='"Beneficiaries"' BadgeColor="Color.Success" />
+        <MudTabPanel Icon="@Icons.Material.Filled.MiscellaneousServices" BadgeData='"Other"' BadgeColor="Color.Warning" />
+        <MudTabPanel Icon="@Icons.Material.Filled.MiscellaneousServices" BadgeIcon="@Icons.Material.Filled.WarningAmber" BadgeColor="Color.Warning" />
+    </MudTabs>
+</MudLayout>
+
+@code {
+    
+}
