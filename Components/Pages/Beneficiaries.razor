@@ -1,0 +1,26 @@
+﻿@page "/beneficiaries"
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-20">
+    <MudPaper Height="650px">
+        <MudIconButton Icon="fas fa-plus" Color="Color.Tertiary" />
+            <MudText Typo="Typo.h5">Beneficiaries</MudText>
+            <MudTextField @bind-Value="searchString1"
+                          Placeholder="Search All Beneficiaries..."
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          IconSize="Size.Medium"
+                          FullWidth="true" />
+
+    <MudList T="string">
+        
+        @foreach(var beneficiary in beneficiaries)
+        {
+            <MudListItem Text="@beneficiary" Icon="@Icons.Material.Filled.People"/>
+        }
+    </MudList>
+    </MudPaper>
+    </MudContainer>
+@code {
+    string searchString1 = "";
+    public List<string> beneficiaries = new List<string>();
+}

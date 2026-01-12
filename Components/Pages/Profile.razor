@@ -1,0 +1,15 @@
+﻿@page "/profile"
+
+<MudLayout>
+    <MudMainContent Class="content-with-fab">
+    <MudTextField @bind-Value="ReadOnly" @bind-Label="AppVer" ReadOnly="true" Variant="Variant.Filled" />
+        </MudMainContent>
+    
+    <MudFab Color="Color.Secondary"
+            StartIcon="@Icons.Material.Filled.Logout"
+            Class="fab-bottom" />
+</MudLayout>
+@code {
+    public string AppVer { get; set; } = "Vault v(1.1)";
+    public string ReadOnly { get; set; } =  DateTime.Now.ToLongDateString();
+}

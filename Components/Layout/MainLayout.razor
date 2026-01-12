@@ -1,21 +1,58 @@
-﻿@inherits LayoutComponentBase
-
+﻿
+@inherits LayoutComponentBase
 <MudThemeProvider />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
-
 <MudLayout>
-    <MudTabs Elevation="3" Rounded="true" Centered="false" Position="Position.Bottom">
-        <MudTabPanel Icon="@Icons.Material.Filled.Dashboard" BadgeData='"Dashboard"' BadgeColor="Color.Info" />
-        <MudTabPanel Icon="@Icons.Material.Filled.Policy" BadgeData='"Policies"' />
-        <MudTabPanel Icon="@Icons.Material.Filled.AccountBalance" BadgeData='"Accounts"' BadgeColor="Color.Error" />
-        <MudTabPanel Icon="@Icons.Material.Filled.People" BadgeData='"Beneficiaries"' BadgeColor="Color.Success" />
-        <MudTabPanel Icon="@Icons.Material.Filled.MiscellaneousServices" BadgeData='"Other"' BadgeColor="Color.Warning" />
-        <MudTabPanel Icon="@Icons.Material.Filled.MiscellaneousServices" BadgeIcon="@Icons.Material.Filled.WarningAmber" BadgeColor="Color.Warning" />
-    </MudTabs>
+    <MudAppBar Color="Color.Tertiary" Fixed="true">
+        <MudIconButton Icon="@Icons.Material.Filled.ManageAccounts" OnClick="GrawerToggle" Color="Color.Inherit" />
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.Subscriptions" Color="Color.Inherit" />
+    </MudAppBar>
+    <MudDrawer @bind-Open="@_drawerOpen">
+        <Profile />
+    </MudDrawer>
+    <MudMainContent>
+        <MudPaper Class="bottom-tabs">
+            <MudTabs Centered="false" Position="Position.Bottom" MinimumTabWidth="1px" @bind-ActivePanelIndex="_activeTab">
+                <ChildContent>
+                    <MudTabPanel Icon="@Icons.Material.Filled.Dashboard" Text="Dashboard" IconColor="Color.Tertiary">
+                        <Dashboard OnNavigate="NavigateToTab" />
+                    </MudTabPanel>
+                    <MudTabPanel Icon="@Icons.Material.Filled.Policy" Text="Policies" IconColor="Color.Tertiary">
+                        <Policies />
+                    </MudTabPanel>
+                    <MudTabPanel Icon="@Icons.Material.Filled.CommentBank" Text="Accounts" IconColor="Color.Tertiary">
+                        <Accounts />
+                    </MudTabPanel>
+                    <MudTabPanel Icon="@Icons.Material.Filled.People" Text="Beneficiaries" IconColor="Color.Tertiary">
+                        <Beneficiaries />
+                    </MudTabPanel>
+                    <MudTabPanel Icon="@Icons.Material.Filled.DevicesOther" Text="Other" IconColor="Color.Tertiary">
+                        <Other />
+                    </MudTabPanel>
+                </ChildContent>
+            </MudTabs>
+        </MudPaper>
+    </MudMainContent>
 </MudLayout>
-
 @code {
-    
+    private int _activeTab = 0;
+
+    void NavigateToTab(int tabIndex)
+    {
+        _activeTab = tabIndex;
+    }
+    private MudTabs _tabs = null;
+    bool _drawerOpen = false;
+    private void GrawerToggle(MouseEventArgs args)
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private Task ActivateAsync(int index)
+    {
+         return _tabs.ActivatePanelAsync(index);
+    }
 }

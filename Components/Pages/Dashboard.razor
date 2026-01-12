@@ -1,0 +1,91 @@
+﻿@page "/dashboard"
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-6">
+    <MudGrid Justify="Justify.Center" Spacing="4">
+
+        <!-- Card 1 -->
+        <MudItem xs="12" sm="6">
+            <MudCard Hover="true" Ripple="true" Class="stat-card" Style="color:burlywood" OnClick="@(() => GoToTab(1))">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudIcon Icon="@Icons.Material.Filled.Policy" />
+                        <MudText Typo="Typo.h6">Insurance Policies</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.Add"/>
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.h4">0</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Card 2 -->
+        <MudItem xs="12" sm="6">
+            <MudCard Class="stat-card" Style="color:cornflowerblue">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudIcon Icon="@Icons.Material.Filled.CommentBank" />
+                        <MudText Typo="Typo.h6">Bank & Accounts</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.Add" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.h4">0</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Card 3 -->
+        <MudItem xs="12" sm="6">
+            <MudCard Class="stat-card" Style="color:cadetblue">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudIcon Icon="@Icons.Material.Filled.People" />
+                        <MudText Typo="Typo.h6">Beneficiaries</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.Add" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.h4">0</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Card 4 -->
+        <MudItem xs="12" sm="6">
+            <MudCard Class="stat-card" Style="color:burlywood">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudIcon Icon="@Icons.Material.Filled.DevicesOther" />
+                        <MudText Typo="Typo.h6">Other</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.Add" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.h4">0</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    [Parameter] public EventCallback<int> OnNavigate { get; set; }
+
+    public Task GoToTab(int index)
+    {
+        return OnNavigate.InvokeAsync(index);
+    }
+    public void NagigateToInsurance()
+    {
+        
+    }
+
+}
