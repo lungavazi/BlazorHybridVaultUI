@@ -1,6 +1,60 @@
 ﻿@page "/beneficiary"
-<h3>Beneficiary</h3>
+@* @using System.Text.RegularExpressions *@
 
-    private Beneficiary beneficiary = new();
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    @* <DataAnnotationsValidator /> *@
+    <MudGrid>
+        <MudItem xs="12">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="Full Name" MaxLength="50"
+                                  @bind-Value="model.Name" For="@(() => model.Name)" />
+                    <MudTextField Label="Relationship" Class="mt-3" MaxLength="50"
+                                  @bind-Value="model.Relationship" For="@(() => model.Relationship)" />
+                    <MudTextField Label="CellNo" Class="mt-3"
+                                  @bind-Value="model.CellNo" For="@(() => model.CellNo)" />
+                    <MudTextField Label="Email" Class="mt-3" MaxLength="50"
+                                  @bind-Value="model.Email" For="@(() => model.Email)" />
+                    <MudTextField Label="Physical Address" Class="mt-3" Lines="5" MaxLength="100"
+                                  @bind-Value="model.Address" For="@(() => model.Address)" />
+                    <MudTextField T="DateTime" Format="yyyy-MM-dd" Label="Date" InputType="InputType.Date"
+                                  @bind-Value="model.DateOfBirth" For="@(() => model.DateOfBirth)" />
+                    <MudSelect T="string" Label="Select beneficiary" @bind-Value="_selectedBeneficiary">
+                        <MudSelectItem Value="@("Cappuccino")" />
+                        <MudSelectItem Value="@("Cafe Latte")" />
+                        <MudSelectItem Value="@("Espresso")" />
+                        <MudSelectItem Value="@("Irish Coffee")" />
+                    </MudSelect>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Save</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+@code {
+    string _selectedBeneficiary;
+    BeneficiaryModel model = new BeneficiaryModel();
+    bool success;
+
+    public class BeneficiaryModel
+    {
+        public long Id { get; set; }
+        public string Name { get; set; }
+        public long UserId { get; set; }
+        public string Relationship { get; set; }
+        public string CellNo { get; set; }
+        public string SecondaryTelephone { get; set; }
+        public string Email { get; set; }
+        public string SecondaryEmail { get; set; }
+        public string Address { get; set; }
+        public DateTime DateOfBirth { get; set; }
+    }
+    private void OnValidSubmit(EditContext context)
+    {
+        success = true;
+        StateHasChanged();
+    }
 
 }

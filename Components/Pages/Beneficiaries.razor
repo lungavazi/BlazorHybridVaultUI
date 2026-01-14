@@ -1,8 +1,9 @@
 ﻿@page "/beneficiaries"
-
+@inject IDialogService DialogService
+@inject IHttpClientFactory ClientFactory
 <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-20">
     <MudPaper Height="650px">
-        <MudIconButton Icon="fas fa-plus" Color="Color.Tertiary" />
+        <MudIconButton Icon="fas fa-plus" Color="Color.Tertiary" OnClick="AddBeneficiaryAsync"/>
             <MudText Typo="Typo.h5">Beneficiaries</MudText>
             <MudTextField @bind-Value="searchString1"
                           Placeholder="Search All Beneficiaries..."
@@ -10,17 +11,52 @@
                           AdornmentIcon="@Icons.Material.Filled.Search"
                           IconSize="Size.Medium"
                           FullWidth="true" />
-
-    <MudList T="string">
-        
+        <MudList T="BeneficiaryDto">
         @foreach(var beneficiary in beneficiaries)
         {
-            <MudListItem Text="@beneficiary" Icon="@Icons.Material.Filled.People"/>
+                <MudListItem Text="@beneficiary.Name" SecondaryText="@beneficiary.Relationship" Icon="@Icons.Material.Filled.People"/>
         }
     </MudList>
     </MudPaper>
     </MudContainer>
 @code {
+    public async Task AddBeneficiaryAsync()
+    {
+        var options = new DialogOptions() { CloseButton = true,FullWidth=true, MaxWidth = MaxWidth.Small, Position=DialogPosition.Center };
+        var dialog = await DialogService.ShowAsync<Beneficiary>("Add Beneficiary", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await base.OnInitializedAsync();
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"https://localhost:7112/api/v1/beneficiaries/{"lunga@gmail.com"}");
+
+            var httpClient = ClientFactory.CreateClient();
+            using var response = await httpClient.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                using var responseStream = await response.Content.ReadAsStreamAsync();
+                beneficiaries = await JsonSerializer.DeserializeAsync<IEnumerable<BeneficiaryDto>>(responseStream);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            beneficiaries = new List<BeneficiaryDto>();
+            // throw;
+        }
+    }
+
+    public EventCallback ViewBeneficiareyAsync ;
     string searchString1 = "";
-    public List<string> beneficiaries = new List<string>();
+    public IEnumerable<BeneficiaryDto> beneficiaries = new List<BeneficiaryDto>();
 }

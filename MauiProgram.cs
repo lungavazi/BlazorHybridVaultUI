@@ -17,9 +17,10 @@ namespace VaultUI
 
             builder.Services.AddMudServices();
             builder.Services.AddMauiBlazorWebView();
+            builder.Services.AddHttpClient();
 
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
 

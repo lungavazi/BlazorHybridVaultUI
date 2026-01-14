@@ -1,0 +1,38 @@
+﻿@page "/account"
+
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    @* <DataAnnotationsValidator /> *@
+    <MudGrid>
+        <MudItem xs="12">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="Account Name" MaxLength="50"
+                                  @bind-Value="model.Name" For="@(() => model.Name)" />
+                    <MudTextField Label="Account Type" Class="mt-3" MaxLength="50"
+                                  @bind-Value="model.AccountType" For="@(() => model.AccountType)" />
+                    <MudTextField Label="Account No" Class="mt-3"
+                                  @bind-Value="model.AccountNo" For="@(() => model.AccountNo)" />
+                    <MudSelect T="string" Label="Select beneficiary" @bind-Value="_selectedBeneficiary">
+                        <MudSelectItem Value="@("Cappuccino")" />
+                        <MudSelectItem Value="@("Cafe Latte")" />
+                        <MudSelectItem Value="@("Espresso")" />
+                        <MudSelectItem Value="@("Irish Coffee")" />
+                    </MudSelect>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Save</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+@code {
+    string _selectedBeneficiary;
+    AccountDto model = new AccountDto();
+    bool success;
+    private void OnValidSubmit(EditContext context)
+    {
+        success = true;
+        StateHasChanged();
+    }
+}

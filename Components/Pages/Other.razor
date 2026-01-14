@@ -1,4 +1,5 @@
 ﻿@page "/other"
+@inject IHttpClientFactory ClientFactory
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-20">
     <MudPaper Height="650px">
@@ -10,39 +11,42 @@
                           AdornmentIcon="@Icons.Material.Filled.Search"
                           IconSize="Size.Medium"
                           FullWidth="true" />
-    <MudList T="string">
-        <MudListItem>
-            <AvatarContent>
-                <MudAvatar>
-                    <MudImage Src="images/mony.jpg" />
-                </MudAvatar>
-            </AvatarContent>
-            <ChildContent>
-                Photos
-            </ChildContent>
-        </MudListItem>
-        <MudListItem>
-            <AvatarContent>
-                <MudAvatar>
-                    <MudIcon Icon="@Icons.Material.Filled.Work" Color="Color.Primary" />
-                </MudAvatar>
-            </AvatarContent>
-            <ChildContent>
-                Work
-            </ChildContent>
-        </MudListItem>
-        <MudListItem>
-            <AvatarContent>
-                <MudAvatar Color="Color.Tertiary">V</MudAvatar>
-            </AvatarContent>
-            <ChildContent>
-                Vacation
-            </ChildContent>
-        </MudListItem>
-    </MudList>
+        <MudList T="string">
+
+            @foreach (var other in others)
+            {
+                <MudListItem Text="@other.Name" SecondaryText="@other.Description" Icon="@Icons.Material.Filled.Policy" />
+            }
+        </MudList>
     </MudPaper>
 </MudContainer>
 
 @code {
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+            await base.OnInitializedAsync();
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"https://localhost:7112/api/v1/others/{"lunga@gmail.com"}");
+
+            var httpClient = ClientFactory.CreateClient();
+            using var response = await httpClient.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                using var responseStream = await response.Content.ReadAsStreamAsync();
+                others = await JsonSerializer.DeserializeAsync<IEnumerable<OtherDto>>(responseStream);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            throw;
+        }
+
+    }
+    private IEnumerable<OtherDto> others = new List<OtherDto>();
     string searchString1 = "";
 }

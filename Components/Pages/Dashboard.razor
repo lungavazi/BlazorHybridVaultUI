@@ -1,4 +1,6 @@
 ﻿@page "/dashboard"
+@inject IHttpClientFactory ClientFactory
+
 <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-6">
     <MudGrid Justify="Justify.Center" Spacing="4">
 
@@ -15,7 +17,7 @@
                     </CardHeaderActions>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudText Typo="Typo.h4">0</MudText>
+                    <MudText Typo="Typo.h4">@DashBoardDto.PolicyCount</MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -33,7 +35,7 @@
                     </CardHeaderActions>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudText Typo="Typo.h4">0</MudText>
+                    <MudText Typo="Typo.h4">@DashBoardDto.AccountCount</MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -51,7 +53,7 @@
                     </CardHeaderActions>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudText Typo="Typo.h4">0</MudText>
+                    <MudText Typo="Typo.h4" ref>@DashBoardDto.BeneficiaryCount</MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -69,7 +71,7 @@
                     </CardHeaderActions>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudText Typo="Typo.h4">0</MudText>
+                    <MudText Typo="Typo.h4">@DashBoardDto.OtherCount</MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -77,6 +79,30 @@
 </MudContainer>
 
 @code {
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await base.OnInitializedAsync();
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"https://localhost:7112/api/v1/vaultdashboard/{"lunga@gmail.com"}");
+
+            var httpClient = ClientFactory.CreateClient();
+            using var response = await httpClient.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                using var responseStream = await response.Content.ReadAsStreamAsync();
+                DashBoardDto = await JsonSerializer.DeserializeAsync<VaultDashBoardDto>(responseStream);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            DashBoardDto = new VaultDashBoardDto();
+            //throw;
+        }
+    }
     [Parameter] public EventCallback<int> OnNavigate { get; set; }
 
     public Task GoToTab(int index)
@@ -85,7 +111,8 @@
     }
     public void NagigateToInsurance()
     {
-        
+
     }
+    public VaultDashBoardDto DashBoardDto = new VaultDashBoardDto();
 
 }
