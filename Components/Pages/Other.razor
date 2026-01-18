@@ -1,7 +1,7 @@
 ﻿@page "/other"
 @inject IHttpClientFactory ClientFactory
 
-<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-20">
+<MudContainer MaxWidth="MaxWidth.Medium">
     <MudPaper Height="650px">
         <MudIconButton Icon="fas fa-plus" Color="Color.Tertiary" />
             <MudText Typo="Typo.h5">Others</MudText>
@@ -26,10 +26,9 @@
     {
         try
         {
-
             await base.OnInitializedAsync();
 
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"https://localhost:7112/api/v1/others/{"lunga@gmail.com"}");
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/others/{"lunga@gmail.com"}");
 
             var httpClient = ClientFactory.CreateClient();
             using var response = await httpClient.SendAsync(request);
@@ -43,7 +42,8 @@
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            throw;
+            others = new List<OtherDto>();
+            // throw;
         }
 
     }

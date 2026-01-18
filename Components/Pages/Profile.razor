@@ -1,15 +1,88 @@
 ﻿@page "/profile"
+@inject IHttpClientFactory ClientFactory
 
 <MudLayout>
     <MudMainContent Class="content-with-fab">
     <MudTextField @bind-Value="ReadOnly" @bind-Label="AppVer" ReadOnly="true" Variant="Variant.Filled" />
-        </MudMainContent>
-    
-    <MudFab Color="Color.Secondary"
-            StartIcon="@Icons.Material.Filled.Logout"
-            Class="fab-bottom" />
-</MudLayout>
+     </MudMainContent>
+
+     <MudPaper Class="pa-4">
+        <MudForm Disabled="true">
+         <MudTextField @bind-Value="fullName" Immediate="true" Label="Full Name" />
+        </MudForm> 
+    </MudPaper>
+    <MudPaper Class="pa-4">
+        <MudForm Disabled="true">
+            <MudTextField @bind-Value="cellNumber" Immediate="true" Label="Cell Number." />
+        </MudForm>
+    </MudPaper>
+    <MudPaper Class="pa-4">
+        <MudForm Disabled="true">
+            <MudTextField @bind-Value="email" Immediate="true" Label="Email." />
+        </MudForm>
+    </MudPaper>
+
+     <MudExpansionPanels MultiExpansion="true">
+    <MudExpansionPanel Text="Abount Vault" Icon="@Icons.Material.Rounded.Info">
+        LegacyVault, developed by The Bridge Technologies, is designed to address this challenge by
+        enabling individuals to securely record and share essential financial information with their chosen
+        beneficiaries. The platform bridges the information gap between financial institutions and
+        beneficiaries, ensuring that critical details are accessible when they are needed most.
+    </MudExpansionPanel>
+</MudExpansionPanels>
+  </MudLayout>
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudGrid>
+        <MudItem xs="12">
+            <MudFab Color="Color.Tertiary"
+                    StartIcon="@Icons.Material.Filled.Logout"
+                    Class="fab-bottom" />
+        </MudItem>
+    </MudGrid>
+</MudContainer>
 @code {
+
+    public string fullName { get; set; }
+    public string cellNumber { get; set; }
+    public string email { get; set; } 
+    public string dateOfBirth { get; set; } 
     public string AppVer { get; set; } = "Vault v(1.1)";
     public string ReadOnly { get; set; } =  DateTime.Now.ToLongDateString();
+    private UserInfoDto user = new UserInfoDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await base.OnInitializedAsync();
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/user/{"lunga@gmail.com"}");
+
+            var httpClient = ClientFactory.CreateClient();
+            using var response = await httpClient.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                using var responseStream = await response.Content.ReadAsStreamAsync();
+                user = await JsonSerializer.DeserializeAsync<UserInfoDto>(responseStream);
+
+                if (user != null)
+                    InitializeUserFields(user);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            user = new UserInfoDto();
+            // throw;
+        }
+    }
+
+    private void InitializeUserFields(UserInfoDto user)
+    {
+        fullName = $"{user.Name} {user.Surname}"; 
+        cellNumber = $"{user.telephone}";
+        email = $"{user.UserName}"; 
+        dateOfBirth = $"{user.IdNumber}";
+    }
 }

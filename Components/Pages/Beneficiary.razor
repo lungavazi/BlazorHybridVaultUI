@@ -1,30 +1,25 @@
 ﻿@page "/beneficiary"
-@* @using System.Text.RegularExpressions *@
+@inject ISnackbar Snackbar
+@inject IHttpClientFactory ClientFactory
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
-    @* <DataAnnotationsValidator /> *@
+    <DataAnnotationsValidator />
     <MudGrid>
         <MudItem xs="12">
             <MudCard>
                 <MudCardContent>
-                    <MudTextField Label="Full Name" MaxLength="50"
+                    <MudTextField Label="Full Name" MaxLength="50" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Abc" AdornmentColor="Color.Primary" Immediate="true"
                                   @bind-Value="model.Name" For="@(() => model.Name)" />
-                    <MudTextField Label="Relationship" Class="mt-3" MaxLength="50"
+                    <MudTextField Label="Relationship" Class="mt-3" MaxLength="50" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.People" AdornmentColor="Color.Primary" Immediate="true"
                                   @bind-Value="model.Relationship" For="@(() => model.Relationship)" />
-                    <MudTextField Label="CellNo" Class="mt-3"
-                                  @bind-Value="model.CellNo" For="@(() => model.CellNo)" />
-                    <MudTextField Label="Email" Class="mt-3" MaxLength="50"
+                    <MudTextField Label="CellNo" Class="mt-3" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.ContactPhone" AdornmentColor="Color.Primary" Immediate="true"
+                                  @bind-Value="model.CellPhone" For="@(() => model.CellPhone)" />
+                    <MudTextField Label="Email" Class="mt-3" MaxLength="50" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Email" AdornmentColor="Color.Primary" Immediate="true"
                                   @bind-Value="model.Email" For="@(() => model.Email)" />
-                    <MudTextField Label="Physical Address" Class="mt-3" Lines="5" MaxLength="100"
+                    <MudTextField Label="Physical Address" Class="mt-3" Lines="5" MaxLength="100" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Home" AdornmentColor="Color.Primary" Immediate="true"
                                   @bind-Value="model.Address" For="@(() => model.Address)" />
-                    <MudTextField T="DateTime" Format="yyyy-MM-dd" Label="Date" InputType="InputType.Date"
+                    <MudTextField T="DateTime" Format="yyyy-MM-dd" Label="Date" InputType="InputType.Date" AdornmentIcon="@Icons.Material.Filled.DateRange" AdornmentColor="Color.Primary"
                                   @bind-Value="model.DateOfBirth" For="@(() => model.DateOfBirth)" />
-                    <MudSelect T="string" Label="Select beneficiary" @bind-Value="_selectedBeneficiary">
-                        <MudSelectItem Value="@("Cappuccino")" />
-                        <MudSelectItem Value="@("Cafe Latte")" />
-                        <MudSelectItem Value="@("Espresso")" />
-                        <MudSelectItem Value="@("Irish Coffee")" />
-                    </MudSelect>
                 </MudCardContent>
                 <MudCardActions>
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Save</MudButton>
@@ -34,27 +29,78 @@
     </MudGrid>
 </EditForm>
 @code {
-    string _selectedBeneficiary;
     BeneficiaryModel model = new BeneficiaryModel();
-    bool success;
-
     public class BeneficiaryModel
     {
         public long Id { get; set; }
+        [Required]
         public string Name { get; set; }
         public long UserId { get; set; }
+        [Required]
+        public string Relationship { get; set; }
+        [Required]
+        public string CellPhone { get; set; }
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+        [Required]
+        public string Address { get; set; }
+        [Required]
+        public DateTime DateOfBirth { get; set; }
+    }
+    private Task OnValidSubmit(EditContext context)
+    {
+        StateHasChanged();
+        return Save();
+    }
+    async Task Save()
+    {
+        var beneficiaryID = await CreateBeneficiaryAsync();
+        model = beneficiaryID > 0 ? new BeneficiaryModel() : model;
+        Snackbar.Add(beneficiaryID > 0 ? "Beneficiary created successfully" : "Error occurred.");
+    }
+    private class BeneficiaryCreateDto
+    {
+        public string Name { get; set; }
+        public string UserName { get; set; }
         public string Relationship { get; set; }
         public string CellNo { get; set; }
         public string SecondaryTelephone { get; set; }
         public string Email { get; set; }
-        public string SecondaryEmail { get; set; }
+        public string secondaryEmail { get; set; }
         public string Address { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; }
     }
-    private void OnValidSubmit(EditContext context)
+    private async Task<int> CreateBeneficiaryAsync()
     {
-        success = true;
-        StateHasChanged();
-    }
+        try
+        {
+            var dtoObect = new BeneficiaryCreateDto();
+            dtoObect.Name = model.Name;
+            dtoObect.UserName = "lunga@gmail.com";
+            dtoObect.Relationship = model.Relationship;
+            dtoObect.CellNo = model.CellPhone;
+            dtoObect.SecondaryTelephone = model.CellPhone;
+            dtoObect.Email = model.Email;
+            dtoObect.secondaryEmail = model.Email;
+            dtoObect.Address = model.Address;
+            dtoObect.DateOfBirth = model.DateOfBirth.ToShortDateString();
+            int beneficiaryID = 0;
 
+            var httpClient = ClientFactory.CreateClient();
+            using var response = await httpClient.PostAsJsonAsync($"{Constants.API_URL}/beneficiary/",dtoObect);
+
+            if (response.IsSuccessStatusCode)
+            {
+                using var responseStream = await response.Content.ReadAsStreamAsync();
+                beneficiaryID = await JsonSerializer.DeserializeAsync<int>(responseStream);
+            }
+            return beneficiaryID;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.InnerException);
+            throw;
+        }
+    }
 }

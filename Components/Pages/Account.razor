@@ -1,22 +1,25 @@
 ﻿@page "/account"
+@inject IHttpClientFactory ClientFactory
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
-    @* <DataAnnotationsValidator /> *@
+    <DataAnnotationsValidator />
     <MudGrid>
         <MudItem xs="12">
             <MudCard>
                 <MudCardContent>
-                    <MudTextField Label="Account Name" MaxLength="50"
+                    <MudTextField Label="Account Name" MaxLength="50" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Abc" AdornmentColor="Color.Primary" Immediate="true"
                                   @bind-Value="model.Name" For="@(() => model.Name)" />
-                    <MudTextField Label="Account Type" Class="mt-3" MaxLength="50"
+                    <MudTextField Label="Account Type" Class="mt-3" MaxLength="50" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Abc" AdornmentColor="Color.Primary" Immediate="true"
                                   @bind-Value="model.AccountType" For="@(() => model.AccountType)" />
-                    <MudTextField Label="Account No" Class="mt-3"
+                    <MudTextField Label="Account No" Class="mt-3" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Numbers" AdornmentColor="Color.Primary" Immediate="true"
                                   @bind-Value="model.AccountNo" For="@(() => model.AccountNo)" />
-                    <MudSelect T="string" Label="Select beneficiary" @bind-Value="_selectedBeneficiary">
-                        <MudSelectItem Value="@("Cappuccino")" />
-                        <MudSelectItem Value="@("Cafe Latte")" />
-                        <MudSelectItem Value="@("Espresso")" />
-                        <MudSelectItem Value="@("Irish Coffee")" />
+                    <MudSelect T="long" Label="Select beneficiary" @bind-Value="model.BeneficiaryId" For="@(() => model.BeneficiaryId)" AdornmentIcon="@Icons.Material.Filled.People" AdornmentColor="Color.Primary" Immediate="true">
+                        @foreach (var beneficiary in beneficiaries)
+                        {
+                            <MudSelectItem Value="@beneficiary.Id">@beneficiary.Name</MudSelectItem>
+                        }
                     </MudSelect>
                 </MudCardContent>
                 <MudCardActions>
@@ -28,11 +31,81 @@
 </EditForm>
 @code {
     string _selectedBeneficiary;
-    AccountDto model = new AccountDto();
-    bool success;
-    private void OnValidSubmit(EditContext context)
+    AccountModel model = new AccountModel();
+
+    private class AccountModel
     {
-        success = true;
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        public long BeneficiaryId { get; set; }
+        [Required]
+        public string AccountType { get; set; }
+        [Required]
+        public string AccountNo { get; set; }
+        [Required]
+        public DateTime DateOpened { get; set; }
+    }
+
+    private class AccountDtoCreate
+    {
+        public string Name { get; set; }
+        public string UserName { get; set; }
+        public long BeneficiaryId { get; set; }
+        public string AccountType { get; set; }
+        public string AccountNo { get; set; }
+        public DateTime DateOpened { get; set; }
+    }
+    IEnumerable<BeneficiaryDto> beneficiaries = new List<BeneficiaryDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var httpClient = ClientFactory.CreateClient();
+        using var response = await httpClient.GetAsync($"{Constants.API_URL}/beneficiaries/{"lunga@gmail.com"}");
+        if (response.IsSuccessStatusCode)
+        {
+            using var responseStream = await response.Content.ReadAsStreamAsync();
+            beneficiaries = await JsonSerializer.DeserializeAsync<IEnumerable<BeneficiaryDto>>(responseStream);
+        }
+    }
+    private Task OnValidSubmit(EditContext context)
+    {
         StateHasChanged();
+        return Save();
+    }
+    async Task Save()
+    {
+        var accoundId = await CreateAccountAsync();
+        model = accoundId > 0 ? new AccountModel() : model;
+        Snackbar.Add(accoundId > 0 ? "Account created successfully" : "Error occurred.");
+    }
+    private async Task<int> CreateAccountAsync()
+    {
+        try
+        {
+            AccountDtoCreate accountDto = new AccountDtoCreate();
+            accountDto.Name = model.Name;
+            accountDto.UserName = "lunga@gmail.com";
+            accountDto.BeneficiaryId = model.BeneficiaryId;
+            accountDto.AccountType = model.AccountType;
+            accountDto.AccountNo = model.AccountNo;
+            accountDto.DateOpened = model.DateOpened;
+
+            var httpClient = ClientFactory.CreateClient();
+            using var response = await httpClient.PostAsJsonAsync($"{Constants.API_URL}/account/", accountDto);
+
+            var accountId = 0;
+            if (response.IsSuccessStatusCode)
+            {
+                using var responseStream = await response.Content.ReadAsStreamAsync();
+                accountId = await JsonSerializer.DeserializeAsync<int>(responseStream);
+            }
+            return accountId;
+        }
+        catch (Exception)
+        {
+            
+            throw;
+        }   
     }
 }

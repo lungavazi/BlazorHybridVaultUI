@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using MudBlazor;
 using MudBlazor.Services;
 
 namespace VaultUI
@@ -15,7 +16,18 @@ namespace VaultUI
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
 
-            builder.Services.AddMudServices();
+            builder.Services.AddMudServices( configuration =>
+            {
+                configuration.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomCenter;
+                configuration.SnackbarConfiguration.PreventDuplicates = false;
+                configuration.SnackbarConfiguration.ShowCloseIcon = true;
+                configuration.SnackbarConfiguration.VisibleStateDuration = 1000;
+                configuration.SnackbarConfiguration.HideTransitionDuration = 500;
+                configuration.SnackbarConfiguration.ShowTransitionDuration = 500;
+                configuration.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+            }
+                
+                );
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddHttpClient();
 

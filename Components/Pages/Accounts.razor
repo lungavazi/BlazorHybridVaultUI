@@ -2,7 +2,7 @@
 @inject IHttpClientFactory ClientFactory
 @inject IDialogService DialogService
 
-<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-20">
+<MudContainer MaxWidth="MaxWidth.Medium">
     <MudPaper Height="650px">
         <MudIconButton Icon="fas fa-plus" Color="Color.Tertiary" OnClick="AddAccountAsync" />
             <MudText Typo="Typo.h5">Accounts</MudText>
@@ -41,7 +41,7 @@
         {
             await base.OnInitializedAsync();
 
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"https://localhost:7112/api/v1/accounts/{"lunga@gmail.com"}");
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/accounts/{"lunga@gmail.com"}");
 
             var httpClient = ClientFactory.CreateClient();
             using var response = await httpClient.SendAsync(request);

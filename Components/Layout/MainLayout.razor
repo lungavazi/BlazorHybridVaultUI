@@ -5,12 +5,12 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 <MudLayout>
-    <MudAppBar Color="Color.Tertiary" Fixed="true">
+    <MudAppBar Color="Color.Tertiary" Fixed="true" > 
         <MudIconButton Icon="@Icons.Material.Filled.ManageAccounts" OnClick="GrawerToggle" Color="Color.Inherit" />
         <MudSpacer />
         <MudIconButton Icon="@Icons.Material.Filled.Subscriptions" Color="Color.Inherit" />
     </MudAppBar>
-    <MudDrawer @bind-Open="@_drawerOpen">
+    <MudDrawer @bind-Open="@_drawerOpen" Variant="DrawerVariant.Temporary">
         <Profile />
     </MudDrawer>
     <MudMainContent>
