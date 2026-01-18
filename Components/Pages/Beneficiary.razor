@@ -30,24 +30,7 @@
 </EditForm>
 @code {
     BeneficiaryModel model = new BeneficiaryModel();
-    public class BeneficiaryModel
-    {
-        public long Id { get; set; }
-        [Required]
-        public string Name { get; set; }
-        public long UserId { get; set; }
-        [Required]
-        public string Relationship { get; set; }
-        [Required]
-        public string CellPhone { get; set; }
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
-        [Required]
-        public string Address { get; set; }
-        [Required]
-        public DateTime DateOfBirth { get; set; }
-    }
+   
     private Task OnValidSubmit(EditContext context)
     {
         StateHasChanged();
@@ -59,18 +42,7 @@
         model = beneficiaryID > 0 ? new BeneficiaryModel() : model;
         Snackbar.Add(beneficiaryID > 0 ? "Beneficiary created successfully" : "Error occurred.");
     }
-    private class BeneficiaryCreateDto
-    {
-        public string Name { get; set; }
-        public string UserName { get; set; }
-        public string Relationship { get; set; }
-        public string CellNo { get; set; }
-        public string SecondaryTelephone { get; set; }
-        public string Email { get; set; }
-        public string secondaryEmail { get; set; }
-        public string Address { get; set; }
-        public string DateOfBirth { get; set; }
-    }
+    
     private async Task<int> CreateBeneficiaryAsync()
     {
         try

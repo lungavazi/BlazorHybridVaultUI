@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace VaultUI.Data
+namespace VaultUI.Data.Dto
 {
     public class PolicyDto
     {

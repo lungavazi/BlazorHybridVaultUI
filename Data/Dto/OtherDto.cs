@@ -1,5 +1,4 @@
-﻿
-namespace VaultUI.Data
+﻿namespace VaultUI.Data.Dto
 {
     public class OtherDto
     {

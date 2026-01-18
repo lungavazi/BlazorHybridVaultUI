@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace VaultUI.Data
+namespace VaultUI.Data.Dto
 {
     public class BeneficiaryDto
     {

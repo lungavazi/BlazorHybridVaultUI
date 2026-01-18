@@ -2,7 +2,7 @@
 @inject ISnackbar Snackbar
 @inject IHttpClientFactory ClientFactory
 
-<EditForm Model="@model" @ref=editForm OnValidSubmit="OnValidSubmit">
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
     <MudGrid>
         <MudItem xs="12">
@@ -31,33 +31,7 @@
     </MudGrid>
 </EditForm>
 @code {
-    string _selectedBeneficiary;
     PolicyModel model = new PolicyModel();
-    EditForm editForm;
-    private class PolicyModel
-    {
-        [Required]
-        public string Name { get; set; }
-        [Required]
-        public string InsuranceType { get; set; }
-        [Required]
-        public string InsuranceNo { get; set; }
-        [Required]
-        public DateTime DateOpened { get; set; }
-        [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Please select a beneficiary.")]
-        public long BeneficiaryId { get; set; }
-    }
-
-    private class InsuranceCreateDto
-    {
-        public string Name { get; set; }
-        public string UserName { get; set; }
-        public long BeneficiaryId { get; set; }
-        public string InsuranceType { get; set; }
-        public string InsuranceNo { get; set; }
-        public DateTime DateOpened { get; set; }
-    }
 
     IEnumerable<BeneficiaryDto> beneficiaries = new List<BeneficiaryDto>();
 
