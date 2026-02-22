@@ -2,111 +2,121 @@
 @using VaultUI.Data.Dto
 @inject IHttpClientFactory ClientFactory
 <MudContainer MaxWidth="MaxWidth.Medium">
-    <MudPaper Height="650px">
-    <MudGrid>
-            <MudItem xs="12">
-                <MudBadge Color="badgeColor" Overlap="true" Bordered="true">
-    <MudAvatar>
-        <MudImage Src="images/jonny.jpg" />
-    </MudAvatar>
-</MudBadge>
-</MudItem>
-</MudGrid >
-    <MudGrid >
-        <MudItem xs="12" sm="6">
-            <MudCard Hover="true" Ripple="true" Class="stat-card" Style="color:burlywood" OnClick="@(() => GoToTab(1))">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudIcon Icon="@Icons.Material.Filled.Policy" />
-                        <MudText Typo="Typo.h6">Insurance Policies</MudText>
-                    </CardHeaderContent>
-                    <CardHeaderActions>
-                        <MudIconButton Icon="@Icons.Material.Filled.Add"/>
-                    </CardHeaderActions>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudText Typo="Typo.h4">@DashBoardDto.PolicyCount</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
+	<MudPaper Height="650px">
+		<MudGrid>
+			<MudContainer Class="mt-6">
+				<MudAlert Severity="Severity.Success" Class="mt-16" ContentAlignment="HorizontalAlignment.Center">@LastStatusText
 
-        <MudItem xs="12" sm="6">
-            <MudCard Class="stat-card" Style="color:cornflowerblue">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudIcon Icon="@Icons.Material.Filled.CommentBank" />
-                        <MudText Typo="Typo.h6">Bank & Accounts</MudText>
-                    </CardHeaderContent>
-                    <CardHeaderActions>
-                        <MudIconButton Icon="@Icons.Material.Filled.Add" />
-                    </CardHeaderActions>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudText Typo="Typo.h4">@DashBoardDto.AccountCount</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-
-        <MudItem xs="12" sm="6">
-            <MudCard Class="stat-card" Style="color:cadetblue">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudIcon Icon="@Icons.Material.Filled.People" />
-                        <MudText Typo="Typo.h6">Beneficiaries</MudText>
-                    </CardHeaderContent>
-                    <CardHeaderActions>
-                        <MudIconButton Icon="@Icons.Material.Filled.Add" />
-                    </CardHeaderActions>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudText Typo="Typo.h4" ref>@DashBoardDto.BeneficiaryCount</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-
-        <MudItem xs="12" sm="6">
-            <MudCard Class="stat-card" Style="color:burlywood">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudIcon Icon="@Icons.Material.Filled.DevicesOther" />
-                        <MudText Typo="Typo.h6">Other</MudText>
-                    </CardHeaderContent>
-                    <CardHeaderActions>
-                        <MudIconButton Icon="@Icons.Material.Filled.Add" />
-                    </CardHeaderActions>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudText Typo="Typo.h4">@DashBoardDto.OtherCount</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-        </MudGrid>
-    </MudPaper>
+                    <MudFab Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Recycling" DropShadow="false" />
+				</MudAlert>
+			</MudContainer>
+		</MudGrid>
+		<MudGrid>
+			<MudItem xs="12"
+			         sm="6">
+				<MudCard Hover="true"
+				         Ripple="true"
+				         Class="stat-card"
+				         Style="color:burlywood"
+				         OnClick="@(() => GoToTab(1))">
+					<MudCardHeader>
+						<CardHeaderContent>
+							<MudIcon Icon="@Icons.Material.Filled.Policy"/>
+							<MudText Typo="Typo.h6">Insurance Policies</MudText>
+						</CardHeaderContent>
+						<CardHeaderActions>
+							<MudIconButton Icon="@Icons.Material.Filled.Add"/>
+						</CardHeaderActions>
+					</MudCardHeader>
+					<MudCardContent>
+						<MudText Typo="Typo.h4">@DashBoardDto.PolicyCount</MudText>
+					</MudCardContent>
+				</MudCard>
+			</MudItem>
+			<MudItem xs="12"
+			         sm="6">
+				<MudCard Class="stat-card"
+				         Style="color:cornflowerblue">
+					<MudCardHeader>
+						<CardHeaderContent>
+							<MudIcon Icon="@Icons.Material.Filled.CommentBank"/>
+							<MudText Typo="Typo.h6">Bank & Accounts</MudText>
+						</CardHeaderContent>
+						<CardHeaderActions>
+							<MudIconButton Icon="@Icons.Material.Filled.Add"/>
+						</CardHeaderActions>
+					</MudCardHeader>
+					<MudCardContent>
+						<MudText Typo="Typo.h4">@DashBoardDto.AccountCount</MudText>
+					</MudCardContent>
+				</MudCard>
+			</MudItem>
+			<MudItem xs="12"
+			         sm="6">
+				<MudCard Class="stat-card"
+				         Style="color:cadetblue">
+					<MudCardHeader>
+						<CardHeaderContent>
+							<MudIcon Icon="@Icons.Material.Filled.People"/>
+							<MudText Typo="Typo.h6">Beneficiaries</MudText>
+						</CardHeaderContent>
+						<CardHeaderActions>
+							<MudIconButton Icon="@Icons.Material.Filled.Add"/>
+						</CardHeaderActions>
+					</MudCardHeader>
+					<MudCardContent>
+						<MudText Typo="Typo.h4"
+						         ref>@DashBoardDto.BeneficiaryCount
+						 </MudText>
+					</MudCardContent>
+				</MudCard>
+			</MudItem>
+			<MudItem xs="12"
+			         sm="6">
+				<MudCard Class="stat-card"
+				         Style="color:burlywood">
+					<MudCardHeader>
+						<CardHeaderContent>
+							<MudIcon Icon="@Icons.Material.Filled.DevicesOther"/>
+							<MudText Typo="Typo.h6">Other</MudText>
+						</CardHeaderContent>
+						<CardHeaderActions>
+							<MudIconButton Icon="@Icons.Material.Filled.Add"/>
+						</CardHeaderActions>
+					</MudCardHeader>
+					<MudCardContent>
+						<MudText Typo="Typo.h4">@DashBoardDto.OtherCount</MudText>
+					</MudCardContent>
+				</MudCard>
+			</MudItem>
+		</MudGrid>
+	</MudPaper>
 </MudContainer>
 
 @code {
-    [Parameter] public EventCallback<int> OnNavigate { get; set; }
+	[Parameter] public EventCallback<int> OnNavigate { get; set; }
 
-    public Task GoToTab(int index)
-    {
-        return OnNavigate.InvokeAsync(index);
-    }
-    public void NagigateToInsurance()
-    {
+	public Task GoToTab(int index)
+	{
+		return OnNavigate.InvokeAsync(index);
+	}
+	public void NagigateToInsurance()
+	{
 
-    }
-    public VaultDashBoardDto DashBoardDto = new VaultDashBoardDto();
+	}
+	public VaultDashBoardDto DashBoardDto = new VaultDashBoardDto();
 
-    Color badgeColor = Color.Warning;
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            await base.OnInitializedAsync();
+	Color badgeColor = Color.Warning;
+	private string LastStatusText = "Last status check: Not yet checked";
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			await base.OnInitializedAsync();
 
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/vaultdashboard/{"lunga@gmail.com"}");
-
-            var httpClient = ClientFactory.CreateClient();
+			using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/vaultdashboard/{"lunga@gmail.com"}");
+			LastStatusText = LastStatusText = $"Last status check: {DateTime.Now:yyyy-MM-dd HH:mm:ss}";
+			var httpClient = ClientFactory.CreateClient();
             using var response = await httpClient.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
