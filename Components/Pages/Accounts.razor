@@ -7,15 +7,16 @@
     <MudPaper Height="650px">
         <MudIconButton Icon="fas fa-plus" Color="Color.Tertiary" OnClick="AddAccountAsync" />
             <MudText Typo="Typo.h5">Accounts</MudText>
-            <MudTextField @bind-Value="searchString1"
+            <MudTextField @bind-Value="searchString"
                           Placeholder="Search All Accounts"
                           Adornment="Adornment.Start"
                           AdornmentIcon="@Icons.Material.Filled.Search"
                           IconSize="Size.Medium"
-                          FullWidth="true" />
+                          FullWidth="true"
+                          @onkeydown="HandleKeyDown"/>
         <MudList T="string">
 
-            @foreach (var account in accounts)
+            @foreach (var account in AccountsDto)
             {
                 <MudListItem Text="@account.Name" SecondaryText="@account.AccountType" Icon="@Icons.Material.Filled.CommentBank" />
             }
@@ -24,6 +25,8 @@
     </MudContainer>
 
 @code {
+    string searchString;
+
     public async Task AddAccountAsync()
     {
         var options = new DialogOptions() { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center };
@@ -35,14 +38,20 @@
 
         }
     }
-
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+             OnInitializedAsync();
+        }
+    }
     protected override async Task OnInitializedAsync()
     {
         try
         {
             await base.OnInitializedAsync();
 
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/accounts/{"lunga@gmail.com"}");
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/accounts/{"lunga@gmail.com"}?accountName={searchString}");
 
             var httpClient = ClientFactory.CreateClient();
             using var response = await httpClient.SendAsync(request);
@@ -50,17 +59,15 @@
             if (response.IsSuccessStatusCode)
             {
                 using var responseStream = await response.Content.ReadAsStreamAsync();
-                accounts = await JsonSerializer.DeserializeAsync<IEnumerable<AccountDto>>(responseStream);
+                AccountsDto = await JsonSerializer.DeserializeAsync<IEnumerable<AccountDto>>(responseStream);
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            accounts = new List<AccountDto>();
             // throw;
         }
 
     }
-    private IEnumerable<AccountDto> accounts = new List<AccountDto>();
-    string searchString1 = "";
+    private IEnumerable<AccountDto> AccountsDto = new List<AccountDto>();
 }

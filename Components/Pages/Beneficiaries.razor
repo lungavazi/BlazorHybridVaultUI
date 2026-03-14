@@ -6,14 +6,15 @@
     <MudPaper Height="650px">
         <MudIconButton Icon="fas fa-plus" Color="Color.Tertiary" OnClick="AddBeneficiaryAsync"/>
             <MudText Typo="Typo.h5">Beneficiaries</MudText>
-            <MudTextField @bind-Value="searchString1"
+        <MudTextField @bind-Value="searchString"
                           Placeholder="Search All Beneficiaries..."
                           Adornment="Adornment.Start"
                           AdornmentIcon="@Icons.Material.Filled.Search"
                           IconSize="Size.Medium"
-                          FullWidth="true" />
+                          FullWidth="true"
+                          @onkeydown="HandleKeyDown" />
         <MudList T="BeneficiaryDto">
-        @foreach(var beneficiary in beneficiaries)
+            @foreach (var beneficiary in BeneficiariesDto)
         {
                 <MudListItem Text="@beneficiary.Name" SecondaryText="@beneficiary.Relationship" Icon="@Icons.Material.Filled.People"/>
         }
@@ -21,6 +22,18 @@
     </MudPaper>
     </MudContainer>
 @code {
+
+    // public EventCallback ViewBeneficiareyAsync;
+    string searchString = "";
+    public IEnumerable<BeneficiaryDto> BeneficiariesDto = new List<BeneficiaryDto>();
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            OnInitializedAsync();
+        }
+    }
+
     public async Task AddBeneficiaryAsync()
     {
         var options = new DialogOptions() { CloseButton = true,FullWidth=true, MaxWidth = MaxWidth.Small, Position=DialogPosition.Center };
@@ -38,7 +51,7 @@
         {
             await base.OnInitializedAsync();
 
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/beneficiaries/{"lunga@gmail.com"}");
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/beneficiaries/{"lunga@gmail.com"}?beneficiaryName={searchString}");
 
             var httpClient = ClientFactory.CreateClient();
             using var response = await httpClient.SendAsync(request);
@@ -46,18 +59,14 @@
             if (response.IsSuccessStatusCode)
             {
                 using var responseStream = await response.Content.ReadAsStreamAsync();
-                beneficiaries = await JsonSerializer.DeserializeAsync<IEnumerable<BeneficiaryDto>>(responseStream);
+                BeneficiariesDto = await JsonSerializer.DeserializeAsync<IEnumerable<BeneficiaryDto>>(responseStream);
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            beneficiaries = new List<BeneficiaryDto>();
             // throw;
         }
     }
 
-    public EventCallback ViewBeneficiareyAsync ;
-    string searchString1 = "";
-    public IEnumerable<BeneficiaryDto> beneficiaries = new List<BeneficiaryDto>();
 }

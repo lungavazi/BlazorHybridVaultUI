@@ -1,121 +1,149 @@
 ﻿@page "/dashboard"
 @using VaultUI.Data.Dto
 @inject IHttpClientFactory ClientFactory
+@inject IDialogService DialogService
 <MudContainer MaxWidth="MaxWidth.Medium">
-    <MudPaper Height="650px">
-    <MudGrid>
-            <MudItem xs="12">
-                <MudBadge Color="badgeColor" Overlap="true" Bordered="true">
-    <MudAvatar>
-        <MudImage Src="images/jonny.jpg" />
-    </MudAvatar>
-</MudBadge>
-</MudItem>
-</MudGrid >
-    <MudGrid >
-        <MudItem xs="12" sm="6">
-            <MudCard Hover="true" Ripple="true" Class="stat-card" Style="color:burlywood" OnClick="@(() => GoToTab(1))">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudIcon Icon="@Icons.Material.Filled.Policy" />
-                        <MudText Typo="Typo.h6">Insurance Policies</MudText>
-                    </CardHeaderContent>
-                    <CardHeaderActions>
-                        <MudIconButton Icon="@Icons.Material.Filled.Add"/>
-                    </CardHeaderActions>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudText Typo="Typo.h4">@DashBoardDto.PolicyCount</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
+	<MudPaper Height="650px">
+		<MudGrid>
+			<MudContainer Class="mt-6">
+				<MudAlert Severity="Severity.Success" ContentAlignment="HorizontalAlignment.Center">@LastStatusText
 
-        <MudItem xs="12" sm="6">
-            <MudCard Class="stat-card" Style="color:cornflowerblue">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudIcon Icon="@Icons.Material.Filled.CommentBank" />
-                        <MudText Typo="Typo.h6">Bank & Accounts</MudText>
-                    </CardHeaderContent>
-                    <CardHeaderActions>
-                        <MudIconButton Icon="@Icons.Material.Filled.Add" />
-                    </CardHeaderActions>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudText Typo="Typo.h4">@DashBoardDto.AccountCount</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-
-        <MudItem xs="12" sm="6">
-            <MudCard Class="stat-card" Style="color:cadetblue">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudIcon Icon="@Icons.Material.Filled.People" />
-                        <MudText Typo="Typo.h6">Beneficiaries</MudText>
-                    </CardHeaderContent>
-                    <CardHeaderActions>
-                        <MudIconButton Icon="@Icons.Material.Filled.Add" />
-                    </CardHeaderActions>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudText Typo="Typo.h4" ref>@DashBoardDto.BeneficiaryCount</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-
-        <MudItem xs="12" sm="6">
-            <MudCard Class="stat-card" Style="color:burlywood">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudIcon Icon="@Icons.Material.Filled.DevicesOther" />
-                        <MudText Typo="Typo.h6">Other</MudText>
-                    </CardHeaderContent>
-                    <CardHeaderActions>
-                        <MudIconButton Icon="@Icons.Material.Filled.Add" />
-                    </CardHeaderActions>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudText Typo="Typo.h4">@DashBoardDto.OtherCount</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-        </MudGrid>
-    </MudPaper>
+					<MudFab Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Sync" Size="Size.Small" OnClick="ResyncStatus"/>
+				</MudAlert>
+			</MudContainer>
+		</MudGrid>
+		<MudGrid>
+			<MudItem xs="12"
+			         sm="6">
+				<MudCard Hover="true"
+				         Ripple="true"
+				         Class="stat-card"
+						 Style="color:burlywood">
+					<MudCardHeader>
+						<CardHeaderContent>
+							<MudIcon Icon="@Icons.Material.Filled.Policy"/>
+							<MudText Typo="Typo.h6">Insurance Policies</MudText>
+						</CardHeaderContent>
+						<CardHeaderActions>
+							<MudIconButton Icon="@Icons.Material.Filled.Add"/>
+						</CardHeaderActions>
+					</MudCardHeader>
+					<MudCardContent>
+						<MudText Typo="Typo.h4">@DashBoardDto.PolicyCount</MudText>
+					</MudCardContent>
+				</MudCard>
+			</MudItem>
+            <MudItem xs="12" sm="6">
+				<MudCard Class="stat-card"
+				         Style="color:cornflowerblue">
+					<MudCardHeader>
+						<CardHeaderContent>
+							<MudIcon Icon="@Icons.Material.Filled.CommentBank"/>
+							<MudText Typo="Typo.h6">Bank & Accounts</MudText>
+						</CardHeaderContent>
+						<CardHeaderActions>
+							<MudIconButton Icon="@Icons.Material.Filled.Add"/>
+						</CardHeaderActions>
+					</MudCardHeader>
+					<MudCardContent>
+						<MudText Typo="Typo.h4">@DashBoardDto.AccountCount</MudText>
+					</MudCardContent>
+				</MudCard>
+			</MudItem>
+            <MudItem xs="12" sm="6">
+				<MudCard Class="stat-card"
+				         Style="color:cadetblue">
+					<MudCardHeader>
+						<CardHeaderContent>
+							<MudIcon Icon="@Icons.Material.Filled.People"/>
+							<MudText Typo="Typo.h6">Beneficiaries</MudText>
+						</CardHeaderContent>
+						<CardHeaderActions>
+							<MudIconButton Icon="@Icons.Material.Filled.Add"/>
+						</CardHeaderActions>
+					</MudCardHeader>
+					<MudCardContent>
+						<MudText Typo="Typo.h4"
+						         ref>@DashBoardDto.BeneficiaryCount
+						 </MudText>
+					</MudCardContent>
+				</MudCard>
+			</MudItem>
+            <MudItem xs="12" sm="6">
+				<MudCard Class="stat-card"
+				         Style="color:burlywood">
+					<MudCardHeader>
+						<CardHeaderContent>
+							<MudIcon Icon="@Icons.Material.Filled.DevicesOther"/>
+							<MudText Typo="Typo.h6">Other</MudText>
+						</CardHeaderContent>
+						<CardHeaderActions>
+							<MudIconButton Icon="@Icons.Material.Filled.Add"/>
+						</CardHeaderActions>
+					</MudCardHeader>
+					<MudCardContent>
+						<MudText Typo="Typo.h4">@DashBoardDto.OtherCount</MudText>
+					</MudCardContent>
+				</MudCard>
+			</MudItem>
+		</MudGrid>
+	</MudPaper>
 </MudContainer>
 
+<MudDialog @bind-Visible="_visible" Options="_dialogOptions">
+	<TitleContent>
+		<MudText Typo="Typo.h6">
+			Confirmation
+		</MudText>
+	</TitleContent>
+	<DialogContent>
+		<p>Checking your status may result to additional charges. Are you sure you want to re-sync your status?</p>
+	</DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit" Class="px-10">Yes</MudButton>
+		<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Cancel" Class="px-10">No</MudButton>
+	</DialogActions>
+</MudDialog>
+
 @code {
-    [Parameter] public EventCallback<int> OnNavigate { get; set; }
+	private bool _visible;
+	private readonly DialogOptions _dialogOptions = new() { FullWidth = true };
 
-    public Task GoToTab(int index)
-    {
-        return OnNavigate.InvokeAsync(index);
-    }
-    public void NagigateToInsurance()
-    {
 
-    }
-    public VaultDashBoardDto DashBoardDto = new VaultDashBoardDto();
+	private void ResyncStatus() => _visible = true;
 
-    Color badgeColor = Color.Warning;
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            await base.OnInitializedAsync();
+	private void Cancel() => _visible = false;
+	private void Submit()
+	{
+		//sync status.
+		_visible = false;
+	}
 
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/vaultdashboard/{"lunga@gmail.com"}");
+	private static VaultDashBoardDto DashBoardDto;
 
-            var httpClient = ClientFactory.CreateClient();
-            using var response = await httpClient.SendAsync(request);
+	Color badgeColor = Color.Warning;
+	private string LastStatusText = "Last status check: Not yet checked";
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			await base.OnInitializedAsync();
+			if (DashBoardDto == null)
+			{
+				DashBoardDto = new VaultDashBoardDto();
+				using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/vaultdashboard/{"lunga@gmail.com"}");
+				LastStatusText = LastStatusText = $"Last status check: {DateTime.Now:yyyy-MM-dd HH:mm:ss}";
+				var httpClient = ClientFactory.CreateClient();
+				using var response = await httpClient.SendAsync(request);
 
-            if (response.IsSuccessStatusCode)
-            {
-                using var responseStream = await response.Content.ReadAsStreamAsync();
-                DashBoardDto = await JsonSerializer.DeserializeAsync<VaultDashBoardDto>(responseStream);
-                badgeColor = Color.Success;
-            }
-        }
+				if (response.IsSuccessStatusCode)
+				{
+					using var responseStream = await response.Content.ReadAsStreamAsync();
+					DashBoardDto = await JsonSerializer.DeserializeAsync<VaultDashBoardDto>(responseStream);
+					badgeColor = Color.Success;
+				}
+			}
+		}
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);

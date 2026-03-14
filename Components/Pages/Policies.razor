@@ -8,15 +8,16 @@
         <MudIconButton Icon="fas fa-plus" Color="Color.Tertiary"
                        Onclick="AddPolicyAsync" />
         <MudText Typo="Typo.h5">Policies</MudText>
-            <MudTextField @bind-Value="searchString1"
+        <MudTextField @bind-Value="searchString"
                           Placeholder="Search All insurance Policies"
                           Adornment="Adornment.Start"
                           AdornmentIcon="@Icons.Material.Filled.Search"
                           IconSize="Size.Medium"
-                          FullWidth="true"/>
+                          FullWidth="true"
+                      @onkeydown="HandleKeyDown" />
         <MudList T="string">
 
-            @foreach (var policy in policies)
+            @foreach (var policy in PoliciesDto)
             {
                 <MudListItem Text="@policy.Name" SecondaryText="@policy.InsuranceType" Icon="@Icons.Material.Filled.Policy" />
             }
@@ -25,6 +26,15 @@
     </MudContainer>
 
 @code {
+
+    string searchString;
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            OnInitializedAsync();
+        }
+    }
     public async Task AddPolicyAsync()
     {
         var options = new DialogOptions() { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center };
@@ -36,14 +46,14 @@
 
         }
     }
-    public IEnumerable<PolicyDto> policies = new List<PolicyDto>();
+    public IEnumerable<PolicyDto> PoliciesDto = new List<PolicyDto>();
     protected override async Task OnInitializedAsync()
     {
         try
         {
             await base.OnInitializedAsync();
 
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/insurances/{"lunga@gmail.com"}");
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/insurances/{"lunga@gmail.com"}?insuranceName={searchString}");
 
             var httpClient = ClientFactory.CreateClient();
             using var response = await httpClient.SendAsync(request);
@@ -51,16 +61,14 @@
             if (response.IsSuccessStatusCode)
             {
                 using var responseStream = await response.Content.ReadAsStreamAsync();
-                policies = await JsonSerializer.DeserializeAsync<IEnumerable<PolicyDto>>(responseStream);
+                PoliciesDto = await JsonSerializer.DeserializeAsync<IEnumerable<PolicyDto>>(responseStream);
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            policies = new List<PolicyDto>();
             // throw;
         }
 
     }
-    string searchString1 = "";
 }
