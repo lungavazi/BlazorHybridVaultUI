@@ -1,7 +1,6 @@
 ﻿@page "/accounts"
-@using VaultUI.Data.Dto
-@inject IHttpClientFactory ClientFactory
 @inject IDialogService DialogService
+@inject VaultService VaultService
 
 <MudContainer MaxWidth="MaxWidth.Medium">
     <MudPaper Height="650px">
@@ -42,7 +41,7 @@
     {
         if (e.Key == "Enter")
         {
-             OnInitializedAsync();
+            OnInitializedAsync();
         }
     }
     protected override async Task OnInitializedAsync()
@@ -51,23 +50,13 @@
         {
             await base.OnInitializedAsync();
 
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/accounts/{"lunga@gmail.com"}?accountName={searchString}");
-
-            var httpClient = ClientFactory.CreateClient();
-            using var response = await httpClient.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                using var responseStream = await response.Content.ReadAsStreamAsync();
-                AccountsDto = await JsonSerializer.DeserializeAsync<IEnumerable<AccountDto>>(responseStream);
-            }
+            AccountsDto = await VaultService.GetAccoutsAsync("lunga@gmail.com", searchString);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
             // throw;
         }
-
     }
     private IEnumerable<AccountDto> AccountsDto = new List<AccountDto>();
 }

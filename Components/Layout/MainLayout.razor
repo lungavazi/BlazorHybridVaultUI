@@ -1,5 +1,7 @@
 ﻿
 @inherits LayoutComponentBase
+@inject LoadingService Loader
+
 <MudThemeProvider />
 <MudPopoverProvider />
 <MudDialogProvider />
@@ -36,6 +38,10 @@
             </MudTabs>
         </MudPaper>
     </MudMainContent>
+
+    <MudOverlay Visible="@Loader.IsLoading" DarkBackground="true">
+        <MudProgressCircular Indeterminate Size="Size.Large" />
+    </MudOverlay>
 </MudLayout>
 @code {
     private int _activeTab = 0;
