@@ -2,7 +2,7 @@
 
 namespace VaultUI.Data.Dto
 {
-    public class VaultDashBoardDto
+    public class DashboardDto
     {
         [JsonPropertyName("accountCount")]
         public int AccountCount { get; set; }

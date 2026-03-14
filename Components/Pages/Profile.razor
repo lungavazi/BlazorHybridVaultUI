@@ -1,7 +1,6 @@
 ﻿@page "/profile"
 @using VaultUI.Data.Dto
-@inject IHttpClientFactory ClientFactory
-
+@inject VaultService VaultService
 <MudLayout>
     <MudMainContent Class="content-with-fab">
     <MudTextField @bind-Value="ReadOnly" @bind-Label="AppVer" ReadOnly="true" Variant="Variant.Filled" />
@@ -57,19 +56,10 @@
         {
             await base.OnInitializedAsync();
 
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/user/{"lunga@gmail.com"}");
-
-            var httpClient = ClientFactory.CreateClient();
-            using var response = await httpClient.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                using var responseStream = await response.Content.ReadAsStreamAsync();
-                user = await JsonSerializer.DeserializeAsync<UserInfoDto>(responseStream);
+            user = await VaultService.GetUserInfoAsync("lunga@gmail.com");
 
                 if (user != null)
                     InitializeUserFields(user);
-            }
         }
         catch (Exception ex)
         {
