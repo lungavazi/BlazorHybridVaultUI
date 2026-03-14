@@ -53,5 +53,29 @@ namespace VaultUI.Repository
 
             return result ?? new UserInfoDto();
         }
+
+        public async Task<long> PostPolicyAsync(InsuranceCreateDto insurance)
+        {
+            var result = await _apiClient.PostAsync<InsuranceCreateDto, long>(
+                "insurance", insurance);
+
+            return result;
+        }
+
+        public async Task<long> PostAccountAsync(AccountCreateDto account)
+        {
+            var result = await _apiClient.PostAsync<AccountCreateDto, long>(
+                "account", account);
+
+            return result;
+        }
+
+        public async Task<long> PostBeneficiaryAsync(BeneficiaryCreateDto beneficiary)
+        {
+            var result = await _apiClient.PostAsync<BeneficiaryCreateDto, long>(
+                "beneficiary", beneficiary);
+
+            return result;
+        }
     }
 }

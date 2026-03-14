@@ -11,6 +11,7 @@ namespace VaultUI.Data.FormModel
     {
         [Required]
         public string Name { get; set; }
+        public long Id { get; set; }
         [Required]
         public string InsuranceType { get; set; }
         [Required]

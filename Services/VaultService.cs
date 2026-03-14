@@ -34,5 +34,17 @@ namespace VaultUI.Services
         {
             return await _vaultRepository.GetDashboardInfoAsync(username);
         }
+        public async Task<long> CreateBeneficiaryAsync(BeneficiaryCreateDto beneficiary)
+        {
+            return await _vaultRepository.PostBeneficiaryAsync(beneficiary);
+        }
+        public async Task<long> CreateInsuranceAsync(InsuranceCreateDto insurance)
+        {
+            return await _vaultRepository.PostPolicyAsync(insurance);
+        }
+        public async Task<long> CreateAccountAsync(AccountCreateDto account)
+        {
+            return await _vaultRepository.PostAccountAsync(account);
+        }
     }
 }

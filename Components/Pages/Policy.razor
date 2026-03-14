@@ -1,6 +1,8 @@
 ﻿@page "/policy"
 @inject ISnackbar Snackbar
-@inject IHttpClientFactory ClientFactory
+@* @inject IHttpClientFactory ClientFactory *@
+@* @inject IMudDialogInstance MudDialogInstance *@
+@inject VaultService VaultService
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
@@ -31,19 +33,28 @@
     </MudGrid>
 </EditForm>
 @code {
+    [Parameter]
+    public PolicyDto PolicyEditDto { get; set; }
+    // [CascadingParameter]
+    // MudDialogInstance MudDialog { get; set; }
+
     PolicyModel model = new PolicyModel();
 
     IEnumerable<BeneficiaryDto> beneficiaries = new List<BeneficiaryDto>();
 
     protected override async Task OnInitializedAsync()
     {
-        var httpClient = ClientFactory.CreateClient();
-        using var response = await httpClient.GetAsync($"{Constants.API_URL}/beneficiaries/{"lunga@gmail.com"}");
-        if (response.IsSuccessStatusCode)
+        if (PolicyEditDto != null)
         {
-            using var responseStream = await response.Content.ReadAsStreamAsync();
-            beneficiaries = await JsonSerializer.DeserializeAsync<IEnumerable<BeneficiaryDto>>(responseStream);
+            model.Id = PolicyEditDto.Id;
+            model.Name = PolicyEditDto.Name;
+            model.BeneficiaryId = PolicyEditDto.BeneficiaryId;
+            model.DateOpened = PolicyEditDto.DateOpened;
+            model.InsuranceType = PolicyEditDto.InsuranceType;
+            model.InsuranceNo = PolicyEditDto.InsuranceNo;
         }
+
+        beneficiaries = await VaultService.GetBeneficiariesAsync("lunga@gmail.com", null);
     }
     private Task OnValidSubmit(EditContext context)
     {
@@ -57,11 +68,12 @@
         Snackbar.Add(policyId > 0 ? "Policy created successfully" : "Error occurred.");
     }
 
-    private async Task<int> CreatePolicyAsync()
+    private async Task<long> CreatePolicyAsync()
     {
         try
         {
             var policyDto = new InsuranceCreateDto();
+            policyDto.Id = model.Id;
             policyDto.Name = model.Name;
             policyDto.UserName = "lunga@gmail.com";
             policyDto.BeneficiaryId = model.BeneficiaryId;
@@ -69,14 +81,7 @@
             policyDto.InsuranceNo = model.InsuranceNo;
             policyDto.DateOpened = model.DateOpened;
 
-            var httpClient = ClientFactory.CreateClient();
-            using var response = await httpClient.PostAsJsonAsync($"{Constants.API_URL}/insurance/", policyDto);
-            var insuranceId = 0;
-            if (response.IsSuccessStatusCode)
-            {
-                using var responseStream = await response.Content.ReadAsStreamAsync();
-                insuranceId = await JsonSerializer.DeserializeAsync<int>(responseStream);
-            }
+            var insuranceId = await VaultService.CreateInsuranceAsync(policyDto);
             return insuranceId;
         }
         catch (Exception)

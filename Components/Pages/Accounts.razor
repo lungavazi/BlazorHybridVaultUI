@@ -17,7 +17,7 @@
 
             @foreach (var account in AccountsDto)
             {
-                <MudListItem Text="@account.Name" SecondaryText="@account.AccountType" Icon="@Icons.Material.Filled.CommentBank" />
+                <MudListItem Text="@account.Name" SecondaryText="@account.AccountType" Icon="@Icons.Material.Filled.CommentBank" OnClick="@(() => EditAccount(account))"/>
             }
         </MudList>
         </MudPaper>
@@ -25,7 +25,17 @@
 
 @code {
     string searchString;
+    public async Task EditAccount(AccountDto account)
+    {
+        var parameters = new DialogParameters
+        {
+            ["AccountEditDto"] = account
+        };
 
+        var options = new DialogOptions() { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center };
+        var dialog = await DialogService.ShowAsync<Account>("Edit Account", parameters, options);
+        var result = await dialog.Result;
+    }
     public async Task AddAccountAsync()
     {
         var options = new DialogOptions() { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center };

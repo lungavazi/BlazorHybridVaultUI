@@ -8,6 +8,7 @@ namespace VaultUI.Data.Dto
 {
     public class InsuranceCreateDto
     {
+        public long Id { get; set; }
         public string Name { get; set; }
         public string UserName { get; set; }
         public long BeneficiaryId { get; set; }
