@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VaultUI.Data.Dto
 {
-    public class AccountDtoCreate
+    public class AccountCreateDto
     {
         public string Name { get; set; }
         public string UserName { get; set; }

@@ -1,6 +1,6 @@
 ﻿@page "/beneficiary"
 @inject ISnackbar Snackbar
-@inject IHttpClientFactory ClientFactory
+@inject VaultService VaultService
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
@@ -29,8 +29,10 @@
     </MudGrid>
 </EditForm>
 @code {
+    [Parameter]
+    public BeneficiaryDto BeneficiaryEditDto { get; set; }
     BeneficiaryModel model = new BeneficiaryModel();
-   
+
     private Task OnValidSubmit(EditContext context)
     {
         StateHasChanged();
@@ -42,31 +44,36 @@
         model = beneficiaryID > 0 ? new BeneficiaryModel() : model;
         Snackbar.Add(beneficiaryID > 0 ? "Beneficiary created successfully" : "Error occurred.");
     }
-    
-    private async Task<int> CreateBeneficiaryAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        if (BeneficiaryEditDto != null)
+        {
+            model.Address = BeneficiaryEditDto.Address;
+            model.Name = BeneficiaryEditDto.Name;
+            model.UserId = BeneficiaryEditDto.UserId;
+            model.Relationship = BeneficiaryEditDto.Relationship;
+            model.CellPhone = BeneficiaryEditDto.CellNo;
+            // model.DateOfBirth = BeneficiaryEditDto.DateOfBirth;
+            model.Email = BeneficiaryEditDto.Email;
+            model.Id = BeneficiaryEditDto.Id;
+        }
+    }
+    private async Task<long> CreateBeneficiaryAsync()
     {
         try
         {
-            var dtoObect = new BeneficiaryCreateDto();
-            dtoObect.Name = model.Name;
-            dtoObect.UserName = "lunga@gmail.com";
-            dtoObect.Relationship = model.Relationship;
-            dtoObect.CellNo = model.CellPhone;
-            dtoObect.SecondaryTelephone = model.CellPhone;
-            dtoObect.Email = model.Email;
-            dtoObect.secondaryEmail = model.Email;
-            dtoObect.Address = model.Address;
-            dtoObect.DateOfBirth = model.DateOfBirth.ToShortDateString();
-            int beneficiaryID = 0;
+            var beneficiaryCreateDto = new BeneficiaryCreateDto();
+            beneficiaryCreateDto.Name = model.Name;
+            beneficiaryCreateDto.UserName = "lunga@gmail.com";
+            beneficiaryCreateDto.Relationship = model.Relationship;
+            beneficiaryCreateDto.CellNo = model.CellPhone;
+            beneficiaryCreateDto.SecondaryTelephone = model.CellPhone;
+            beneficiaryCreateDto.Email = model.Email;
+            beneficiaryCreateDto.secondaryEmail = model.Email;
+            beneficiaryCreateDto.Address = model.Address;
+            beneficiaryCreateDto.DateOfBirth = model.DateOfBirth.ToShortDateString();
 
-            var httpClient = ClientFactory.CreateClient();
-            using var response = await httpClient.PostAsJsonAsync($"{Constants.API_URL}/beneficiary/",dtoObect);
-
-            if (response.IsSuccessStatusCode)
-            {
-                using var responseStream = await response.Content.ReadAsStreamAsync();
-                beneficiaryID = await JsonSerializer.DeserializeAsync<int>(responseStream);
-            }
+            var beneficiaryID = await VaultService.CreateBeneficiaryAsync(beneficiaryCreateDto);
             return beneficiaryID;
         }
         catch (Exception ex)

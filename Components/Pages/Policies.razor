@@ -19,7 +19,7 @@
 
             @foreach (var policy in PoliciesDto)
             {
-                <MudListItem Text="@policy.Name" SecondaryText="@policy.InsuranceType" Icon="@Icons.Material.Filled.Policy"/>
+                <MudListItem Text="@policy.Name" SecondaryText="@policy.InsuranceType" Icon="@Icons.Material.Filled.Policy" OnClick="@(() => EditPolicy(policy))" />
             }
         </MudList>
 </MudPaper>
@@ -36,6 +36,17 @@
 
             OnInitializedAsync();
         }
+    }
+    public async Task EditPolicy(PolicyDto policy)
+    {
+        var parameters = new DialogParameters
+            {
+                ["PolicyEditDto"] = policy
+            };
+
+        var options = new DialogOptions() { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center };
+        var dialog = await DialogService.ShowAsync<Policy>("Edit Policy", parameters, options);
+
     }
     public async Task AddPolicyAsync()
     {
