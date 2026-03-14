@@ -109,6 +109,7 @@
 	private bool _visible;
 	private readonly DialogOptions _dialogOptions = new() { FullWidth = true };
 
+
 	private void ResyncStatus() => _visible = true;
 
 	private void Cancel() => _visible = false;
@@ -118,7 +119,7 @@
 		_visible = false;
 	}
 
-	public VaultDashBoardDto DashBoardDto = new VaultDashBoardDto();
+	private static VaultDashBoardDto DashBoardDto;
 
 	Color badgeColor = Color.Warning;
 	private string LastStatusText = "Last status check: Not yet checked";
@@ -127,19 +128,22 @@
 		try
 		{
 			await base.OnInitializedAsync();
+			if (DashBoardDto == null)
+			{
+				DashBoardDto = new VaultDashBoardDto();
+				using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/vaultdashboard/{"lunga@gmail.com"}");
+				LastStatusText = LastStatusText = $"Last status check: {DateTime.Now:yyyy-MM-dd HH:mm:ss}";
+				var httpClient = ClientFactory.CreateClient();
+				using var response = await httpClient.SendAsync(request);
 
-			using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/vaultdashboard/{"lunga@gmail.com"}");
-			LastStatusText = LastStatusText = $"Last status check: {DateTime.Now:yyyy-MM-dd HH:mm:ss}";
-			var httpClient = ClientFactory.CreateClient();
-            using var response = await httpClient.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                using var responseStream = await response.Content.ReadAsStreamAsync();
-                DashBoardDto = await JsonSerializer.DeserializeAsync<VaultDashBoardDto>(responseStream);
-                badgeColor = Color.Success;
-            }
-        }
+				if (response.IsSuccessStatusCode)
+				{
+					using var responseStream = await response.Content.ReadAsStreamAsync();
+					DashBoardDto = await JsonSerializer.DeserializeAsync<VaultDashBoardDto>(responseStream);
+					badgeColor = Color.Success;
+				}
+			}
+		}
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
