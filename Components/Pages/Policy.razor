@@ -1,7 +1,5 @@
 ﻿@page "/policy"
 @inject ISnackbar Snackbar
-@* @inject IHttpClientFactory ClientFactory *@
-@* @inject IMudDialogInstance MudDialogInstance *@
 @inject VaultService VaultService
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
@@ -33,10 +31,11 @@
     </MudGrid>
 </EditForm>
 @code {
+    // [CascadingParameter]
+    // public IDialogReference MudDialog { get; set; }
+
     [Parameter]
     public PolicyDto PolicyEditDto { get; set; }
-    // [CascadingParameter]
-    // MudDialogInstance MudDialog { get; set; }
 
     PolicyModel model = new PolicyModel();
 
@@ -56,37 +55,38 @@
 
         beneficiaries = await VaultService.GetBeneficiariesAsync("lunga@gmail.com", null);
     }
-    private Task OnValidSubmit(EditContext context)
+    private async Task OnValidSubmit(EditContext context)
     {
-        StateHasChanged();
-        return Save();
+        await Save();
     }
-    async Task Save()
+    private async Task Save()
     {
-        var policyId = await CreatePolicyAsync();
-        model = policyId > 0 ? new PolicyModel() : model;
-        Snackbar.Add(policyId > 0 ? "Policy created successfully" : "Error occurred.");
+        if (PolicyEditDto != null)
+        {
+            var policyUpdate = new InsuranceUpdateDto { BeneficiaryId = model.BeneficiaryId, Name = model.Name, InsuranceType = model.InsuranceType, DateOpened = model.DateOpened, InsuranceNo = model.InsuranceNo };
+            await VaultService.UpdateInsuranceAsync(model.Id, policyUpdate);
+
+            // MudDialog?.Close();
+        }
+        else
+        {
+            var policyId = await CreatePolicyAsync();
+            model = policyId > 0 ? new PolicyModel() : model;
+            Snackbar.Add(policyId > 0 ? "Policy created successfully" : "Error occurred.");
+        }
     }
 
     private async Task<long> CreatePolicyAsync()
     {
         try
         {
-            var policyDto = new InsuranceCreateDto();
-            policyDto.Id = model.Id;
-            policyDto.Name = model.Name;
-            policyDto.UserName = "lunga@gmail.com";
-            policyDto.BeneficiaryId = model.BeneficiaryId;
-            policyDto.InsuranceType = model.InsuranceType;
-            policyDto.InsuranceNo = model.InsuranceNo;
-            policyDto.DateOpened = model.DateOpened;
+            var policyDto = new InsuranceCreateDto { Name = model.Name, UserName = "lunga@gmail.com", BeneficiaryId = model.BeneficiaryId, InsuranceType = model.InsuranceType, InsuranceNo = model.InsuranceNo, DateOpened = model.DateOpened };
 
             var insuranceId = await VaultService.CreateInsuranceAsync(policyDto);
             return insuranceId;
         }
         catch (Exception)
         {
-            
             throw;
         }
     }

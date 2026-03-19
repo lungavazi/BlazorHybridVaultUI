@@ -46,5 +46,17 @@ namespace VaultUI.Services
         {
             return await _vaultRepository.PostAccountAsync(account);
         }
+        public async Task UpdateBeneficiaryAsync(long id, BeneficiaryUpdateDto beneficiary)
+        {
+            await _vaultRepository.PutBeneficiaryAsync(id, beneficiary);
+        }
+        public async Task UpdateAccountAsync(long id, AccountUpdateDto account)
+        {
+            await _vaultRepository.PutAccountAsync(id, account);
+        }
+        public async Task UpdateInsuranceAsync(long id, InsuranceUpdateDto insurance)
+        {
+            await _vaultRepository.PutInsuranceAsync(id, insurance);
+        }
     }
 }

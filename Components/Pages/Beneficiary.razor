@@ -18,7 +18,7 @@
                                   @bind-Value="model.Email" For="@(() => model.Email)" />
                     <MudTextField Label="Physical Address" Class="mt-3" Lines="5" MaxLength="100" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Home" AdornmentColor="Color.Primary" Immediate="true"
                                   @bind-Value="model.Address" For="@(() => model.Address)" />
-                    <MudTextField T="DateTime" Format="yyyy-MM-dd" Label="Date" InputType="InputType.Date" AdornmentIcon="@Icons.Material.Filled.DateRange" AdornmentColor="Color.Primary"
+                    <MudTextField T="DateTime" Format="yyyy-MM-dd" Label="Date Of Birth" InputType="InputType.Date" AdornmentIcon="@Icons.Material.Filled.DateRange" AdornmentColor="Color.Primary"
                                   @bind-Value="model.DateOfBirth" For="@(() => model.DateOfBirth)" />
                 </MudCardContent>
                 <MudCardActions>
@@ -30,19 +30,27 @@
 </EditForm>
 @code {
     [Parameter]
-    public BeneficiaryDto BeneficiaryEditDto { get; set; }
+    public BeneficiaryDto? BeneficiaryEditDto { get; set; }
     BeneficiaryModel model = new BeneficiaryModel();
 
     private Task OnValidSubmit(EditContext context)
     {
-        StateHasChanged();
+        // StateHasChanged();
         return Save();
     }
-    async Task Save()
+    private async Task Save()
     {
-        var beneficiaryID = await CreateBeneficiaryAsync();
-        model = beneficiaryID > 0 ? new BeneficiaryModel() : model;
-        Snackbar.Add(beneficiaryID > 0 ? "Beneficiary created successfully" : "Error occurred.");
+        if (BeneficiaryEditDto != null)
+        {
+            var beneficiaryUpdate = new BeneficiaryUpdateDto { Name = model.Name, Relationship = model.Relationship, CellNo = model.CellPhone, Email = model.Email, Address = model.Address, DateOfBirth = model.Address };
+            await VaultService.UpdateBeneficiaryAsync(model.Id, beneficiaryUpdate);
+        }
+        else
+        {
+            var beneficiaryID = await CreateBeneficiaryAsync();
+            model = beneficiaryID > 0 ? new BeneficiaryModel() : model;
+            Snackbar.Add(beneficiaryID > 0 ? "Beneficiary created successfully" : "Error occurred.");
+        }
     }
     protected override async Task OnInitializedAsync()
     {

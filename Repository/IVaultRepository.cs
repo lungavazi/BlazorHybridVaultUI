@@ -12,5 +12,8 @@ namespace VaultUI.Repository
         Task<long> PostPolicyAsync(InsuranceCreateDto insurance);
         Task<long> PostBeneficiaryAsync(BeneficiaryCreateDto beneficiRY);
         Task<long> PostAccountAsync(AccountCreateDto account);
+        Task PutBeneficiaryAsync(long id, BeneficiaryUpdateDto beneficiry);
+        Task PutAccountAsync(long id, AccountUpdateDto account);
+        Task PutInsuranceAsync(long id, InsuranceUpdateDto insurance);
     }
 }

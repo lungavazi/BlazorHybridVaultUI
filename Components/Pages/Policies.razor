@@ -14,7 +14,7 @@
                           AdornmentIcon="@Icons.Material.Filled.Search"
                           IconSize="Size.Medium"
                           FullWidth="true"
-                      @onkeydown="HandleKeyDown" />
+                      @onkeydown="HandleKeyDownAsync" />
         <MudList T="string">
 
             @foreach (var policy in PoliciesDto)
@@ -27,21 +27,19 @@
     </MudContainer>
 
 @code {
-
     string searchString;
-    private void HandleKeyDown(KeyboardEventArgs e)
+    private async Task HandleKeyDownAsync(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
         {
-
-            OnInitializedAsync();
+            await RefreshPolicies();
         }
     }
     public async Task EditPolicy(PolicyDto policy)
     {
         var parameters = new DialogParameters
             {
-                ["PolicyEditDto"] = policy
+                ["PolicyEditDto"] = policy,
             };
 
         var options = new DialogOptions() { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center };
@@ -69,7 +67,7 @@
             await base.OnInitializedAsync();
             Loader.IsLoading = true;
 
-            PoliciesDto = await VaultService.GetPoliciesAsync("lunga@gmail.com", searchString);
+            await RefreshPolicies();
 
             Loader.IsLoading = false;
         }
@@ -79,11 +77,15 @@
             Loader.IsLoading = false;
             // throw;
         }
-
     }
 
     public void Dispose()
     {
         Loader.OnChange -= StateHasChanged;
+    }
+
+    private async Task RefreshPolicies()
+    {
+        PoliciesDto = await VaultService.GetPoliciesAsync("lunga@gmail.com", searchString);
     }
 }

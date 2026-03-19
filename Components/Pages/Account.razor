@@ -41,6 +41,7 @@
     {
         if (AccountEditDto != null)
         {
+            model.Id = AccountEditDto.Id;
             model.AccountType = AccountEditDto.AccountType;
             model.BeneficiaryId = AccountEditDto.BeneficiaryId;
             model.AccountNo = AccountEditDto.AccountNo;
@@ -56,9 +57,17 @@
     }
     async Task Save()
     {
-        var accoundId = await CreateAccountAsync();
-        model = accoundId > 0 ? new AccountModel() : model;
-        Snackbar.Add(accoundId > 0 ? "Account created successfully" : "Error occurred.");
+        if (AccountEditDto != null)
+        {
+            var accountUpdate = new AccountUpdateDto { Name = model.Name, AccountNo = model.AccountNo, AccountType = model.AccountType, BeneficiaryId = model.BeneficiaryId, DateOpened = model.DateOpened };
+            await VaultService.UpdateAccountAsync(model.Id, accountUpdate);
+        }
+        else
+        {
+            var accoundId = await CreateAccountAsync();
+            model = accoundId > 0 ? new AccountModel() : model;
+            Snackbar.Add(accoundId > 0 ? "Account created successfully" : "Error occurred.");
+        }
     }
     private async Task<long> CreateAccountAsync()
     {

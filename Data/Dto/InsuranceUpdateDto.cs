@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace VaultUI.Data.Dto
 {
-    public class InsuranceCreateDto
+    public class InsuranceUpdateDto
     {
         public string Name { get; set; }
-        public string UserName { get; set; }
         public long BeneficiaryId { get; set; }
         public string InsuranceType { get; set; }
         public string InsuranceNo { get; set; }
