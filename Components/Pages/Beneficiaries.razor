@@ -13,25 +13,35 @@
                           AdornmentIcon="@Icons.Material.Filled.Search"
                           IconSize="Size.Medium"
                           FullWidth="true"
-                          @onkeydown="HandleKeyDown" />
+                      @onkeydown="HandleKeyDownAsync" />
         <MudList T="BeneficiaryDto">
             @foreach (var beneficiary in BeneficiariesDto)
         {
-                <MudListItem Text="@beneficiary.Name" SecondaryText="@beneficiary.Relationship" Icon="@Icons.Material.Filled.People"/>
+                <MudListItem Text="@beneficiary.Name" SecondaryText="@beneficiary.Relationship" Icon="@Icons.Material.Filled.People" OnClick="@(() => EditBeneficiary(beneficiary))" />
         }
     </MudList>
     </MudPaper>
     </MudContainer>
 @code {
 
-    // public EventCallback ViewBeneficiareyAsync;
+
+    public async Task EditBeneficiary(BeneficiaryDto policy)
+    {
+        var parameters = new DialogParameters
+        {
+            ["BeneficiaryEditDto"] = policy
+        };
+        var options = new DialogOptions() { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center };
+        var dialog = await DialogService.ShowAsync<Beneficiary>("Edit Beneficiary", parameters, options);
+        var result = await dialog.Result;
+    }
     string searchString = "";
     public IEnumerable<BeneficiaryDto> BeneficiariesDto = new List<BeneficiaryDto>();
-    private void HandleKeyDown(KeyboardEventArgs e)
+    private async Task HandleKeyDownAsync(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
         {
-            OnInitializedAsync();
+            await RefreshBenefeciaries();
         }
     }
 
@@ -50,15 +60,17 @@
     {
         try
         {
-            await base.OnInitializedAsync();
-
-            BeneficiariesDto = await VaultService.GetBeneficiariesAsync("lunga@gmail.com", searchString);
+            await RefreshBenefeciaries();
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            // throw;
+            throw;
         }
+    }
+
+    private async Task RefreshBenefeciaries()
+    {
+        BeneficiariesDto = await VaultService.GetBeneficiariesAsync("lunga@gmail.com", searchString);
     }
 
 }

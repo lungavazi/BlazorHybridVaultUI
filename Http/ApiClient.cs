@@ -39,5 +39,10 @@ namespace VaultUI.Http
 
             return await response.Content.ReadFromJsonAsync<TResponse>();
         }
+
+        public async Task PutAsync<TRequest>(string url, TRequest data)
+        {
+            await _httpClient.PutAsJsonAsync(url, data);
+        }
     }
 }

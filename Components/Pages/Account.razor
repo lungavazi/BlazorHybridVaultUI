@@ -1,7 +1,8 @@
 ﻿@page "/account"
-@inject IHttpClientFactory ClientFactory
+@* @inject IHttpClientFactory ClientFactory *@
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
+@inject VaultService VaultService
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
@@ -31,18 +32,23 @@
 </EditForm>
 @code {
     AccountModel model = new AccountModel();
+    [Parameter]
+    public AccountDto AccountEditDto { get; set; }
 
     IEnumerable<BeneficiaryDto> beneficiaries = new List<BeneficiaryDto>();
 
     protected override async Task OnInitializedAsync()
     {
-        var httpClient = ClientFactory.CreateClient();
-        using var response = await httpClient.GetAsync($"{Constants.API_URL}/beneficiaries/{"lunga@gmail.com"}");
-        if (response.IsSuccessStatusCode)
+        if (AccountEditDto != null)
         {
-            using var responseStream = await response.Content.ReadAsStreamAsync();
-            beneficiaries = await JsonSerializer.DeserializeAsync<IEnumerable<BeneficiaryDto>>(responseStream);
+            model.Id = AccountEditDto.Id;
+            model.AccountType = AccountEditDto.AccountType;
+            model.BeneficiaryId = AccountEditDto.BeneficiaryId;
+            model.AccountNo = AccountEditDto.AccountNo;
+            model.Name = AccountEditDto.Name;
+            model.DateOpened = AccountEditDto.DateOpened;
         }
+        beneficiaries = await VaultService.GetBeneficiariesAsync("lunga@gmail.com", null);
     }
     private Task OnValidSubmit(EditContext context)
     {
@@ -51,15 +57,23 @@
     }
     async Task Save()
     {
-        var accoundId = await CreateAccountAsync();
-        model = accoundId > 0 ? new AccountModel() : model;
-        Snackbar.Add(accoundId > 0 ? "Account created successfully" : "Error occurred.");
+        if (AccountEditDto != null)
+        {
+            var accountUpdate = new AccountUpdateDto { Name = model.Name, AccountNo = model.AccountNo, AccountType = model.AccountType, BeneficiaryId = model.BeneficiaryId, DateOpened = model.DateOpened };
+            await VaultService.UpdateAccountAsync(model.Id, accountUpdate);
+        }
+        else
+        {
+            var accoundId = await CreateAccountAsync();
+            model = accoundId > 0 ? new AccountModel() : model;
+            Snackbar.Add(accoundId > 0 ? "Account created successfully" : "Error occurred.");
+        }
     }
-    private async Task<int> CreateAccountAsync()
+    private async Task<long> CreateAccountAsync()
     {
         try
         {
-            AccountDtoCreate accountDto = new AccountDtoCreate();
+            AccountCreateDto accountDto = new AccountCreateDto();
             accountDto.Name = model.Name;
             accountDto.UserName = "lunga@gmail.com";
             accountDto.BeneficiaryId = model.BeneficiaryId;
@@ -67,16 +81,9 @@
             accountDto.AccountNo = model.AccountNo;
             accountDto.DateOpened = model.DateOpened;
 
-            var httpClient = ClientFactory.CreateClient();
-            using var response = await httpClient.PostAsJsonAsync($"{Constants.API_URL}/account/", accountDto);
+            var accountId = await VaultService.CreateAccountAsync(accountDto);
 
-            var accountId = 0;
-            if (response.IsSuccessStatusCode)
-            {
-                using var responseStream = await response.Content.ReadAsStreamAsync();
-                accountId = await JsonSerializer.DeserializeAsync<int>(responseStream);
-            }
-            return accountId;
+             return accountId;
         }
         catch (Exception)
         {

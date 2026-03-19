@@ -1,19 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace VaultUI.Data.FormModel
+namespace VaultUI.Data.Dto
 {
-    public class AccountModel
+    public class AccountCreateDto
     {
-        [Required]
         public string Name { get; set; }
-        public long Id { get; set; }
-        [Required]
+        public string UserName { get; set; }
         public long BeneficiaryId { get; set; }
-        [Required]
         public string AccountType { get; set; }
-        [Required]
         public string AccountNo { get; set; }
-        [Required]
         public DateTime DateOpened { get; set; }
     }
 }
