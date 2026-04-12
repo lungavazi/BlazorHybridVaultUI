@@ -17,7 +17,9 @@
         <MudList T="BeneficiaryDto">
             @foreach (var beneficiary in BeneficiariesDto)
         {
-                <MudListItem Text="@beneficiary.Name" SecondaryText="@beneficiary.Relationship" Icon="@Icons.Material.Filled.People" OnClick="@(() => EditBeneficiary(beneficiary))" />
+                <MudListItem Text="@beneficiary.Name" SecondaryText="@beneficiary.Relationship" Icon="@Icons.Material.Filled.People" OnClick="@(() => EditBeneficiary(beneficiary))">
+                    <MudHighlighter Text="@beneficiary.Name" HighlightedText="@searchString"></MudHighlighter>
+                </MudListItem>
         }
     </MudList>
     </MudPaper>

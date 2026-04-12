@@ -31,8 +31,8 @@
     </MudGrid>
 </EditForm>
 @code {
-    // [CascadingParameter]
-    // public IDialogReference MudDialog { get; set; }
+    [CascadingParameter]
+    public IMudDialogInstance? MudDialog { get; set; }
 
     [Parameter]
     public PolicyDto PolicyEditDto { get; set; }
@@ -65,8 +65,6 @@
         {
             var policyUpdate = new InsuranceUpdateDto { BeneficiaryId = model.BeneficiaryId, Name = model.Name, InsuranceType = model.InsuranceType, DateOpened = model.DateOpened, InsuranceNo = model.InsuranceNo };
             await VaultService.UpdateInsuranceAsync(model.Id, policyUpdate);
-
-            // MudDialog?.Close();
         }
         else
         {
@@ -74,6 +72,7 @@
             model = policyId > 0 ? new PolicyModel() : model;
             Snackbar.Add(policyId > 0 ? "Policy created successfully" : "Error occurred.");
         }
+        MudDialog?.Close(DialogResult.Ok(model));
     }
 
     private async Task<long> CreatePolicyAsync()

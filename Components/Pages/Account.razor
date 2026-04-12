@@ -1,36 +1,39 @@
 ﻿@page "/account"
 @* @inject IHttpClientFactory ClientFactory *@
 @inject ISnackbar Snackbar
-@inject IDialogService DialogService
+@using MudBlazor
 @inject VaultService VaultService
-
-<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
-    <DataAnnotationsValidator />
-    <MudGrid>
-        <MudItem xs="12">
-            <MudCard>
-                <MudCardContent>
-                    <MudTextField Label="Account Name" MaxLength="50" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Abc" AdornmentColor="Color.Primary" Immediate="true"
-                                  @bind-Value="model.Name" For="@(() => model.Name)" />
-                    <MudTextField Label="Account Type" Class="mt-3" MaxLength="50" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Abc" AdornmentColor="Color.Primary" Immediate="true"
-                                  @bind-Value="model.AccountType" For="@(() => model.AccountType)" />
-                    <MudTextField Label="Account No" Class="mt-3" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Numbers" AdornmentColor="Color.Primary" Immediate="true"
-                                  @bind-Value="model.AccountNo" For="@(() => model.AccountNo)" />
-                    <MudSelect T="long" Label="Select beneficiary" @bind-Value="model.BeneficiaryId" For="@(() => model.BeneficiaryId)" AdornmentIcon="@Icons.Material.Filled.People" AdornmentColor="Color.Primary" Immediate="true">
-                        @foreach (var beneficiary in beneficiaries)
-                        {
-                            <MudSelectItem Value="@beneficiary.Id">@beneficiary.Name</MudSelectItem>
-                        }
-                    </MudSelect>
-                </MudCardContent>
-                <MudCardActions>
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Save</MudButton>
-                </MudCardActions>
-            </MudCard>
-        </MudItem>
-    </MudGrid>
-</EditForm>
+    <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudGrid>
+            <MudItem xs="12">
+                <MudCard>
+                    <MudCardContent>
+                        <MudTextField Label="Account Name" MaxLength="50" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Abc" AdornmentColor="Color.Primary" Immediate="true"
+                                      @bind-Value="model.Name" For="@(() => model.Name)" />
+                        <MudTextField Label="Account Type" Class="mt-3" MaxLength="50" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Abc" AdornmentColor="Color.Primary" Immediate="true"
+                                      @bind-Value="model.AccountType" For="@(() => model.AccountType)" />
+                        <MudTextField Label="Account No" Class="mt-3" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Numbers" AdornmentColor="Color.Primary" Immediate="true"
+                                      @bind-Value="model.AccountNo" For="@(() => model.AccountNo)" />
+                        <MudSelect T="long" Label="Select beneficiary" @bind-Value="model.BeneficiaryId" For="@(() => model.BeneficiaryId)" AdornmentIcon="@Icons.Material.Filled.People" AdornmentColor="Color.Primary" Immediate="true">
+                            @foreach (var beneficiary in beneficiaries)
+                            {
+                                <MudSelectItem Value="@beneficiary.Id">@beneficiary.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Save</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </EditForm>
 @code {
+
+    [CascadingParameter]
+    public IMudDialogInstance? MudDialog { get; set; }
+
     AccountModel model = new AccountModel();
     [Parameter]
     public AccountDto AccountEditDto { get; set; }
@@ -68,6 +71,7 @@
             model = accoundId > 0 ? new AccountModel() : model;
             Snackbar.Add(accoundId > 0 ? "Account created successfully" : "Error occurred.");
         }
+        MudDialog?.Close(DialogResult.Ok(model));
     }
     private async Task<long> CreateAccountAsync()
     {

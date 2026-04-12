@@ -9,8 +9,9 @@
 <MudLayout>
     <MudAppBar Color="Color.Tertiary" Fixed="true" > 
         <MudIconButton Icon="@Icons.Material.Filled.ManageAccounts" OnClick="GrawerToggle" Color="Color.Inherit" />
+
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.Subscriptions" Color="Color.Inherit" />
+        <MudChip T="string" Icon="@Icons.Material.Filled.Subscriptions" Color="Color.Secondary">Not Subscribed</MudChip>
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen" Variant="DrawerVariant.Temporary">
         <Profile />
@@ -33,6 +34,9 @@
                     </MudTabPanel>
                     <MudTabPanel Icon="@Icons.Material.Filled.DevicesOther" Text="Other" IconColor="Color.Tertiary">
                         <Other />
+                    </MudTabPanel>
+                    <MudTabPanel Icon="@Icons.Material.Filled.Subscriptions" Text="Subscription" IconColor="Color.Tertiary">
+                        <Subscription />
                     </MudTabPanel>
                 </ChildContent>
             </MudTabs>
