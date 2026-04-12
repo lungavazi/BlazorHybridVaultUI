@@ -19,7 +19,9 @@
 
             @foreach (var policy in PoliciesDto)
             {
-                <MudListItem Text="@policy.Name" SecondaryText="@policy.InsuranceType" Icon="@Icons.Material.Filled.Policy" OnClick="@(() => EditPolicy(policy))" />
+                <MudListItem Text="@policy.Name" SecondaryText="@policy.InsuranceType" Icon="@Icons.Material.Filled.Policy" OnClick="@(() => EditPolicy(policy))">
+                <MudHighlighter Text="@policy.Name" HighlightedText="@searchString"></MudHighlighter>
+                </MudListItem>
             }
         </MudList>
 </MudPaper>
@@ -62,14 +64,15 @@
     {
         try
         {
-            Loader.OnChange += StateHasChanged;
+            // Loader.OnChange += StateHasChanged;
 
             await base.OnInitializedAsync();
             Loader.IsLoading = true;
-
+            // await Task.Delay(3000);
             await RefreshPolicies();
 
             Loader.IsLoading = false;
+            StateHasChanged();
         }
         catch (Exception ex)
         {

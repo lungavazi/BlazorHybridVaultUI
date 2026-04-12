@@ -1,0 +1,89 @@
+﻿@page "/subscription"
+@using System.Text
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudPaper Height="650px">
+        <MudPaper Class="pa-4">
+            <MudStack Spacing="2">
+                <MudButton Color="Color.Error" OnClick="OnExpandCollapseClick"  StartIcon="@Icons.Material.Filled.ExpandMore">Subscription</MudButton>
+                <MudDivider />
+                <MudCollapse Expanded="_expanded">
+                    <MudGrid>
+                        <MudItem xs="12" md="1">
+                            <MudRadioGroup T="CycleType" ValueChanged="OnRadionChaned" Value="Cycle">
+                                <MudRadio Color="Color.Primary" Value="@(CycleType.NoSubscripotion)">None</MudRadio>
+                                <MudRadio Color="Color.Primary" Value="@(CycleType.Daily)">Daily</MudRadio>
+                                <MudRadio Color="Color.Primary" Value="@(CycleType.Weekly)">Weekly</MudRadio>
+                                <MudRadio Color="Color.Primary" Value="@(CycleType.Monthly)">Monthly</MudRadio>
+                                <MudRadio Color="Color.Primary" Value="@(CycleType.Quarterly)">Quarterly</MudRadio>
+                                <MudRadio Color="Color.Primary" Value="@(CycleType.Binary)">Binary</MudRadio>
+                                <MudRadio Color="Color.Primary" Value="@(CycleType.Yearly)">Yearly</MudRadio>
+                            </MudRadioGroup>
+                        </MudItem>
+                        <MudItem xs="12" md="9" Class="d-flex justify-center align-center my-auto">
+                            <MudCard>
+                                <MudCardHeader>
+                                    <CardHeaderContent>
+                                        <MudText Typo="Typo.h5">Subscription Info</MudText>
+                                    </CardHeaderContent>
+                                </MudCardHeader>
+                                <MudCardContent>
+                                    <MudText Typo="Typo.body2">@searchString</MudText>
+                                </MudCardContent>
+                            </MudCard>
+                        </MudItem>
+                        <MudItem xs="12" md="2" Style="width:100%"></MudItem>
+                    </MudGrid>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Subscriptions" Color="Color.Error">Subscribe</MudButton>
+                </MudCollapse>
+            </MudStack>
+        </MudPaper>
+    </MudPaper>
+</MudContainer>
+@code {
+    StringBuilder searchString = new StringBuilder("No Subscription");
+    private void OnRadionChaned(CycleType newValue)
+    {
+        Cycle = newValue;
+        searchString.Clear();
+        switch (Cycle)
+        {
+            case CycleType.NoSubscripotion:
+                searchString.Append("No Subscription");
+                break;
+            case CycleType.Daily:
+                searchString.AppendLine("Daily Subscription");
+                searchString.AppendLine("R7.00");
+                break;
+            case CycleType.Weekly:
+                searchString.AppendLine("Weekly Subscription");
+                searchString.AppendLine("15.00");
+                break;
+            case CycleType.Monthly:
+                searchString.AppendLine("Monthly Subscription");
+                searchString.AppendLine("R80.00");
+                break;
+            case CycleType.Quarterly:
+                searchString.AppendLine("Quarterly Subscription");
+                searchString.AppendLine("90.00");
+                break;
+            case CycleType.Binary:
+                searchString.AppendLine("Binary Subscription");
+                searchString.AppendLine("R100.00");
+                break;
+            case CycleType.Yearly:
+                searchString.AppendLine("Yearly Subscription");
+                searchString.AppendLine("120.00");
+                break;
+            default:
+                searchString.Append(string.Empty);
+                break;
+        }
+    }
+    public CycleType Cycle { get; set; } 
+    bool _expanded = false;
+
+    private void OnExpandCollapseClick()
+    {
+        _expanded = !_expanded;
+    }
+}

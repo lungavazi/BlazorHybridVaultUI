@@ -17,7 +17,9 @@
 
             @foreach (var account in AccountsDto)
             {
-                <MudListItem Text="@account.Name" SecondaryText="@account.AccountType" Icon="@Icons.Material.Filled.CommentBank" OnClick="@(() => EditAccount(account))"/>
+                <MudListItem Text="@account.Name" SecondaryText="@account.AccountType" Icon="@Icons.Material.Filled.CommentBank" OnClick="@(() => EditAccount(account))">
+                    <MudHighlighter Text="@account.Name" HighlightedText="@searchString"></MudHighlighter>
+                </MudListItem>
             }
         </MudList>
         </MudPaper>
@@ -35,6 +37,15 @@
         var options = new DialogOptions() { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center };
         var dialog = await DialogService.ShowAsync<Account>("Edit Account", parameters, options);
         var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            // if (result.Data is AccountModel data)
+                // if (data != null)
+                    // var accountToUpdate = AccountsDto.FirstOrDefault(x => x.Id == data.Id);
+
+        }
+
     }
     public async Task AddAccountAsync()
     {
@@ -44,29 +55,35 @@
 
         if (!result.Canceled)
         {
+            if (result.Data is AccountDto data)
+                if (data != null)
+                    AccountsDto.Select(x => x.Id == data.Id);
 
         }
     }
-    private void HandleKeyDown(KeyboardEventArgs e)
+    private async Task HandleKeyDown(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
         {
-            OnInitializedAsync();
+            await RefreshAccounts();
         }
     }
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            await base.OnInitializedAsync();
-
-            AccountsDto = await VaultService.GetAccoutsAsync("lunga@gmail.com", searchString);
+            await RefreshAccounts();
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
             // throw;
         }
+    }
+
+    private async Task RefreshAccounts()
+    {
+        AccountsDto = await VaultService.GetAccoutsAsync("lunga@gmail.com", searchString);
     }
     private IEnumerable<AccountDto> AccountsDto = new List<AccountDto>();
 }

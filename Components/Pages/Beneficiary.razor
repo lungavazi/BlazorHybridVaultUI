@@ -29,6 +29,10 @@
     </MudGrid>
 </EditForm>
 @code {
+
+    [CascadingParameter]
+    public IMudDialogInstance? MudDialog { get; set; }
+
     [Parameter]
     public BeneficiaryDto? BeneficiaryEditDto { get; set; }
     BeneficiaryModel model = new BeneficiaryModel();
@@ -51,6 +55,7 @@
             model = beneficiaryID > 0 ? new BeneficiaryModel() : model;
             Snackbar.Add(beneficiaryID > 0 ? "Beneficiary created successfully" : "Error occurred.");
         }
+        MudDialog?.Close(DialogResult.Ok(model));
     }
     protected override async Task OnInitializedAsync()
     {
