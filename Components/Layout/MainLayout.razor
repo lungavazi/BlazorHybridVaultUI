@@ -16,24 +16,24 @@
         <Profile />
     </MudDrawer>
             <MudTabs Position="Position.Bottom" Rounded="false" MinimumTabWidth="60px" @bind-ActivePanelIndex="_activeTab" Elevation="0" PanelClass="pa-0" SliderColor="Color.Tertiary">
-                <MudTabPanel Icon="@Icons.Material.Filled.Dashboard" IconColor="Color.Tertiary">
+        <MudTabPanel Icon="@Icons.Material.Filled.Dashboard" IconColor="Color.Tertiary">
                         <Dashboard/>
                     </MudTabPanel>
                 <MudTabPanel Icon="@Icons.Material.Filled.Policy" IconColor="Color.Tertiary">
                         <Policies />
                     </MudTabPanel>
-                <MudTabPanel Icon="@Icons.Material.Filled.CommentBank" IconColor="Color.Tertiary">
+        <MudTabPanel Icon="@Icons.Material.Filled.AccountBalance" IconColor="Color.Tertiary">
                         <Accounts />
                     </MudTabPanel>
-                <MudTabPanel Icon="@Icons.Material.Filled.People" IconColor="Color.Tertiary">
+        <MudTabPanel Icon="@Icons.Material.Filled.People" IconColor="Color.Tertiary">
                         <Beneficiaries />
                     </MudTabPanel>
-                <MudTabPanel Icon="@Icons.Material.Filled.DevicesOther" IconColor="Color.Tertiary">
+                <MudTabPanel Icon="@Icons.Material.Filled.Drafts" IconColor="Color.Tertiary">
                         <Other />
                     </MudTabPanel>
-                <MudTabPanel Icon="@Icons.Material.Filled.Subscriptions" IconColor="Color.Tertiary">
+        <MudTabPanel Icon="@Icons.Material.Filled.Subscriptions" IconColor="Color.Tertiary" >
                         <Subscription />
-                    </MudTabPanel>
+        </MudTabPanel>
             </MudTabs>
     <MudOverlay Visible="@Loader.IsLoading" DarkBackground="true">
         <MudProgressCircular Indeterminate Size="Size.Large" />
