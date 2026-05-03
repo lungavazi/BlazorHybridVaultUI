@@ -64,19 +64,14 @@
     {
         try
         {
-            // Loader.OnChange += StateHasChanged;
-
-            await base.OnInitializedAsync();
+            // await base.OnInitializedAsync();
             Loader.IsLoading = true;
-            // await Task.Delay(3000);
             await RefreshBenefeciaries();
 
             Loader.IsLoading = false;
-            StateHasChanged();
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
             Loader.IsLoading = false;
             // throw;
         }
