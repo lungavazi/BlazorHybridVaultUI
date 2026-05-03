@@ -2,12 +2,10 @@
 {
     public enum CycleType
     {
-        NoSubscripotion,
-        Daily,
+        Trial,
         Weekly,
         Monthly,
         Quarterly,
-        Binary,
         Yearly
     }
 }

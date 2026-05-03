@@ -5,14 +5,12 @@
 <MudContainer>
 	<MudPaper Class="pa-4">
             <MudGrid>
-                @* <MudItem xs="12"> *@
                 <MudContainer Class="mt-6">
 				<MudAlert Severity="Severity.Success" ContentAlignment="HorizontalAlignment.Start">@LastStatusText
 
 					<MudFab Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Sync" Size="Size.Small" OnClick="ResyncStatus"/>
                         </MudAlert>
                     </MudContainer>
-                @* </MudItem> *@
 		</MudGrid>
 		<MudGrid>
 			<MudItem xs="12">

@@ -12,12 +12,10 @@
                     <MudGrid>
                         <MudItem xs="12" md="1">
                             <MudRadioGroup T="CycleType" ValueChanged="OnRadionChaned" Value="Cycle">
-                                <MudRadio Color="Color.Primary" Value="@(CycleType.NoSubscripotion)">None</MudRadio>
-                                <MudRadio Color="Color.Primary" Value="@(CycleType.Daily)">Daily</MudRadio>
+                                <MudRadio Color="Color.Primary" Value="@(CycleType.Trial)">Trial</MudRadio>
                                 <MudRadio Color="Color.Primary" Value="@(CycleType.Weekly)">Weekly</MudRadio>
                                 <MudRadio Color="Color.Primary" Value="@(CycleType.Monthly)">Monthly</MudRadio>
                                 <MudRadio Color="Color.Primary" Value="@(CycleType.Quarterly)">Quarterly</MudRadio>
-                                <MudRadio Color="Color.Primary" Value="@(CycleType.Binary)">Binary</MudRadio>
                                 <MudRadio Color="Color.Primary" Value="@(CycleType.Yearly)">Yearly</MudRadio>
                             </MudRadioGroup>
                         </MudItem>
@@ -29,7 +27,7 @@
                                     </CardHeaderContent>
                                 </MudCardHeader>
                                 <MudCardContent>
-                                    <MudText Typo="Typo.body2">@searchString</MudText>
+                                    <MudText Typo="Typo.body2">@subscriptionDetail</MudText>
                                 </MudCardContent>
                             </MudCard>
                         </MudItem>
@@ -59,42 +57,34 @@
 </MudContainer>
 </div>
 @code {
-    StringBuilder searchString = new StringBuilder("No Subscription History");
+    StringBuilder subscriptionDetail = new StringBuilder("No Subscription History");
     private void OnRadionChaned(CycleType newValue)
     {
         Cycle = newValue;
-        searchString.Clear();
+        subscriptionDetail.Clear();
         switch (Cycle)
         {
-            case CycleType.NoSubscripotion:
-                searchString.Append("No Subscription");
-                break;
-            case CycleType.Daily:
-                searchString.AppendLine("Daily Subscription");
-                searchString.AppendLine("R7.00");
+            case CycleType.Trial:
+                subscriptionDetail.Append("No Subscription");
                 break;
             case CycleType.Weekly:
-                searchString.AppendLine("Weekly Subscription");
-                searchString.AppendLine("15.00");
+                subscriptionDetail.AppendLine("Weekly Subscription");
+                subscriptionDetail.AppendLine("15.00");
                 break;
             case CycleType.Monthly:
-                searchString.AppendLine("Monthly Subscription");
-                searchString.AppendLine("R80.00");
+                subscriptionDetail.AppendLine("Monthly Subscription");
+                subscriptionDetail.AppendLine("29.99");
                 break;
             case CycleType.Quarterly:
-                searchString.AppendLine("Quarterly Subscription");
-                searchString.AppendLine("90.00");
-                break;
-            case CycleType.Binary:
-                searchString.AppendLine("Binary Subscription");
-                searchString.AppendLine("R100.00");
+                subscriptionDetail.AppendLine("Quarterly Subscription");
+                subscriptionDetail.AppendLine("49.99");
                 break;
             case CycleType.Yearly:
-                searchString.AppendLine("Yearly Subscription");
-                searchString.AppendLine("120.00");
+                subscriptionDetail.AppendLine("Yearly Subscription");
+                subscriptionDetail.AppendLine("99.99");
                 break;
             default:
-                searchString.Append(string.Empty);
+                subscriptionDetail.Append(string.Empty);
                 break;
         }
     }

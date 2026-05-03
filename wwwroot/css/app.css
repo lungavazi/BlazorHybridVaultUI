@@ -90,6 +90,7 @@ h1:focus {
     /* Viewport height minus the estimated height of your Tabs/Header */
     height: calc(100vh - 64px);
     overflow-y: auto;
-    padding-bottom: 80px; /* Extra padding to ensure content doesn't sit under tabs */
+    /*padding-bottom: 64px;*/ /* Extra padding to ensure content doesn't sit under tabs */
     padding-top: 70px;
 }
+
