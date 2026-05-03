@@ -1,7 +1,9 @@
 ﻿@page "/subscription"
 @using System.Text
+
+<div class="dashboard-scroll-container">
 <MudContainer MaxWidth="MaxWidth.Medium">
-    <MudPaper Height="650px">
+    <MudPaper>
         <MudPaper Class="pa-4">
             <MudStack Spacing="2">
                 <MudButton Color="Color.Error" OnClick="OnExpandCollapseClick"  StartIcon="@Icons.Material.Filled.ExpandMore">Subscription</MudButton>
@@ -37,10 +39,27 @@
                 </MudCollapse>
             </MudStack>
         </MudPaper>
+        @* <MudText Typo="Typo.h5">History</MudText> *@
+       @*  <MudTextField
+                      Placeholder="Search History"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      IconSize="Size.Medium"
+                      FullWidth="true" />
+        <MudList T="string"> *@
+
+            @*  @foreach (var policy in PoliciesDto)
+                    {
+                        <MudListItem Text="@policy.Name" SecondaryText="@policy.InsuranceType" Icon="@Icons.Material.Filled.Policy" OnClick="@(() => EditPolicy(policy))">
+                            <MudHighlighter Text="@policy.Name" HighlightedText="@searchString"></MudHighlighter>
+                        </MudListItem>
+                    } *@
+        @* </MudList> *@
     </MudPaper>
 </MudContainer>
+</div>
 @code {
-    StringBuilder searchString = new StringBuilder("No Subscription");
+    StringBuilder searchString = new StringBuilder("No Subscription History");
     private void OnRadionChaned(CycleType newValue)
     {
         Cycle = newValue;

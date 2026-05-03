@@ -2,9 +2,11 @@
 @using VaultUI.Data.Dto
 @inject IDialogService DialogService
 @inject VaultService VaultService
+@inject LoadingService Loader
 
+<div class="dashboard-scroll-container">
 <MudContainer MaxWidth="MaxWidth.Medium">
-    <MudPaper Height="650px">
+    <MudPaper>
         <MudIconButton Icon="fas fa-plus" Color="Color.Tertiary" OnClick="AddBeneficiaryAsync"/>
             <MudText Typo="Typo.h5">Beneficiaries</MudText>
         <MudTextField @bind-Value="searchString"
@@ -21,9 +23,10 @@
                     <MudHighlighter Text="@beneficiary.Name" HighlightedText="@searchString"></MudHighlighter>
                 </MudListItem>
         }
-    </MudList>
-    </MudPaper>
-    </MudContainer>
+</MudList>
+</MudPaper>
+</MudContainer>
+</div>
 @code {
 
 
@@ -57,19 +60,27 @@
         {
         }
     }
-
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            // Loader.OnChange += StateHasChanged;
+
+            await base.OnInitializedAsync();
+            Loader.IsLoading = true;
+            // await Task.Delay(3000);
             await RefreshBenefeciaries();
+
+            Loader.IsLoading = false;
+            StateHasChanged();
         }
         catch (Exception ex)
         {
-            throw;
+            Console.WriteLine(ex.Message);
+            Loader.IsLoading = false;
+            // throw;
         }
     }
-
     private async Task RefreshBenefeciaries()
     {
         BeneficiariesDto = await VaultService.GetBeneficiariesAsync("lunga@gmail.com", searchString);

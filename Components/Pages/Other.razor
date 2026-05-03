@@ -2,8 +2,9 @@
 @using VaultUI.Data.Dto
 @inject IHttpClientFactory ClientFactory
 
+<div class="dashboard-scroll-container">
 <MudContainer MaxWidth="MaxWidth.Medium">
-    <MudPaper Height="650px">
+    <MudPaper>
         <MudIconButton Icon="fas fa-plus" Color="Color.Tertiary" />
             <MudText Typo="Typo.h5">Others</MudText>
             <MudTextField @bind-Value="searchString1"
@@ -21,7 +22,7 @@
         </MudList>
     </MudPaper>
 </MudContainer>
-
+</div>
 @code {
     protected override async Task OnInitializedAsync()
     {
