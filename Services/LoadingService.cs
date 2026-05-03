@@ -4,6 +4,7 @@ namespace VaultUI.Services
     public class LoadingService
     {
         public event Action OnChange;
+        private void NotifyChange() => OnChange?.Invoke();
 
         bool isLoading;
 
@@ -12,8 +13,11 @@ namespace VaultUI.Services
             get => isLoading;
             set
             {
-                isLoading = value;
-                OnChange?.Invoke();
+                if (isLoading != value)
+                {
+                    isLoading = value;
+                    NotifyChange();
+                }
             }
         }
     }

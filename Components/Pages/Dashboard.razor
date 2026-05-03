@@ -1,6 +1,7 @@
 ﻿@page "/dashboard"
 @using VaultUI.Data.Dto
 @inject VaultService VaultService
+@inject LoadingService Loader
 <div class="dashboard-scroll-container">
 <MudContainer>
 	<MudPaper Class="pa-4">
@@ -103,7 +104,6 @@
 	private void Cancel() => _visible = false;
 	private void Submit()
 	{
-		//sync status.
 		_visible = false;
 	}
 
@@ -115,12 +115,14 @@
 	{
 		try
 		{
-				DashboardDto = await VaultService.GetDashboardAsync("lunga@gmail.com");
+			Loader.IsLoading = true;
+			DashboardDto = await VaultService.GetDashboardAsync("lunga@gmail.com");
+			Loader.IsLoading = false;
 		}
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
 			DashboardDto = new DashboardDto();
+			Loader.IsLoading = false;
             //throw;
         }
     }

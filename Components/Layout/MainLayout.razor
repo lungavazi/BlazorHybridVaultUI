@@ -7,6 +7,12 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 <MudLayout>
+    @if (Loader.IsLoading)
+    {
+        <MudOverlay Visible="true" DarkBackground="true">
+            <MudProgressCircular Indeterminate Size="Size.Large" />
+        </MudOverlay>
+    }
     <MudAppBar Color="Color.Tertiary" Fixed="true" > 
         <MudIconButton Icon="@Icons.Material.Filled.ManageAccounts" OnClick="GrawerToggle" Color="Color.Inherit" />
         <MudSpacer />
@@ -35,9 +41,6 @@
                         <Subscription />
         </MudTabPanel>
             </MudTabs>
-    <MudOverlay Visible="@Loader.IsLoading" DarkBackground="true">
-        <MudProgressCircular Indeterminate Size="Size.Large" />
-    </MudOverlay>
 </MudLayout>
 @code {
     private int _activeTab = 0;
@@ -52,9 +55,13 @@
     {
         _drawerOpen = !_drawerOpen;
     }
-
-    private Task ActivateAsync(int index)
+    protected override void OnInitialized()
     {
-         return _tabs.ActivatePanelAsync(index);
+        Loader.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        Loader.OnChange -= StateHasChanged;
     }
 }
