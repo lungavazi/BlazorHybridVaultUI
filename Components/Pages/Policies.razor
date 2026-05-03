@@ -3,8 +3,9 @@
 @inject LoadingService Loader
 @inject VaultService VaultService
 
+<div class="dashboard-scroll-container">
 <MudContainer MaxWidth="MaxWidth.Medium">
-       <MudPaper Height="650px">
+       <MudPaper>
         <MudIconButton Icon="fas fa-plus" Color="Color.Tertiary"
                        Onclick="AddPolicyAsync" />
         <MudText Typo="Typo.h5">Policies</MudText>
@@ -25,9 +26,8 @@
             }
         </MudList>
 </MudPaper>
-
-    </MudContainer>
-
+</MudContainer>
+</div>
 @code {
     string searchString;
     private async Task HandleKeyDownAsync(KeyboardEventArgs e)

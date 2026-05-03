@@ -1,9 +1,10 @@
 ﻿@page "/accounts"
 @inject IDialogService DialogService
 @inject VaultService VaultService
-
+@inject LoadingService Loader
+<div class="dashboard-scroll-container">
 <MudContainer MaxWidth="MaxWidth.Medium">
-    <MudPaper Height="650px">
+    <MudPaper>
         <MudIconButton Icon="fas fa-plus" Color="Color.Tertiary" OnClick="AddAccountAsync" />
             <MudText Typo="Typo.h5">Accounts</MudText>
             <MudTextField @bind-Value="searchString"
@@ -24,7 +25,7 @@
         </MudList>
         </MudPaper>
     </MudContainer>
-
+    </div>
 @code {
     string searchString;
     public async Task EditAccount(AccountDto account)
@@ -72,11 +73,20 @@
     {
         try
         {
+            // Loader.OnChange += StateHasChanged;
+
+            await base.OnInitializedAsync();
+            Loader.IsLoading = true;
+            // await Task.Delay(3000);
             await RefreshAccounts();
+
+            Loader.IsLoading = false;
+            StateHasChanged();
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
+            Loader.IsLoading = false;
             // throw;
         }
     }

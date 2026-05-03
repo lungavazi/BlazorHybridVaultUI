@@ -9,40 +9,32 @@
 <MudLayout>
     <MudAppBar Color="Color.Tertiary" Fixed="true" > 
         <MudIconButton Icon="@Icons.Material.Filled.ManageAccounts" OnClick="GrawerToggle" Color="Color.Inherit" />
-
         <MudSpacer />
         <MudChip T="string" Icon="@Icons.Material.Filled.Subscriptions" Color="Color.Secondary">Not Subscribed</MudChip>
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen" Variant="DrawerVariant.Temporary">
         <Profile />
     </MudDrawer>
-    <MudMainContent>
-        <MudPaper Class="bottom-tabs">
-            <MudTabs Centered="false" Position="Position.Bottom" MinimumTabWidth="1px" @bind-ActivePanelIndex="_activeTab">
-                <ChildContent>
-                    <MudTabPanel Icon="@Icons.Material.Filled.Dashboard" Text="Dashboard" IconColor="Color.Tertiary">
+            <MudTabs Position="Position.Bottom" Rounded="false" MinimumTabWidth="60px" @bind-ActivePanelIndex="_activeTab" Elevation="0" PanelClass="pa-0" SliderColor="Color.Tertiary">
+                <MudTabPanel Icon="@Icons.Material.Filled.Dashboard" IconColor="Color.Tertiary">
                         <Dashboard/>
                     </MudTabPanel>
-                    <MudTabPanel Icon="@Icons.Material.Filled.Policy" Text="Policies" IconColor="Color.Tertiary">
+                <MudTabPanel Icon="@Icons.Material.Filled.Policy" IconColor="Color.Tertiary">
                         <Policies />
                     </MudTabPanel>
-                    <MudTabPanel Icon="@Icons.Material.Filled.CommentBank" Text="Accounts" IconColor="Color.Tertiary">
+                <MudTabPanel Icon="@Icons.Material.Filled.CommentBank" IconColor="Color.Tertiary">
                         <Accounts />
                     </MudTabPanel>
-                    <MudTabPanel Icon="@Icons.Material.Filled.People" Text="Beneficiaries" IconColor="Color.Tertiary">
+                <MudTabPanel Icon="@Icons.Material.Filled.People" IconColor="Color.Tertiary">
                         <Beneficiaries />
                     </MudTabPanel>
-                    <MudTabPanel Icon="@Icons.Material.Filled.DevicesOther" Text="Other" IconColor="Color.Tertiary">
+                <MudTabPanel Icon="@Icons.Material.Filled.DevicesOther" IconColor="Color.Tertiary">
                         <Other />
                     </MudTabPanel>
-                    <MudTabPanel Icon="@Icons.Material.Filled.Subscriptions" Text="Subscription" IconColor="Color.Tertiary">
+                <MudTabPanel Icon="@Icons.Material.Filled.Subscriptions" IconColor="Color.Tertiary">
                         <Subscription />
                     </MudTabPanel>
-                </ChildContent>
             </MudTabs>
-        </MudPaper>
-    </MudMainContent>
-
     <MudOverlay Visible="@Loader.IsLoading" DarkBackground="true">
         <MudProgressCircular Indeterminate Size="Size.Large" />
     </MudOverlay>
