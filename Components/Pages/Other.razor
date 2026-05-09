@@ -18,6 +18,11 @@
             @foreach (var other in others)
             {
                 <MudListItem Text="@other.Name" SecondaryText="@other.Description" Icon="@Icons.Material.Filled.Policy" />
+                    @* <MudHighlighter Text="@other.Name" HighlightedText="@searchString"></MudHighlighter> *@
+                    <MudMenu Icon="@Icons.Material.Filled.Settings"
+                             Color="Color.Tertiary">
+                        <MudMenuItem Label="Delete" />
+                    </MudMenu>
             }
         </MudList>
     </MudPaper>

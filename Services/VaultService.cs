@@ -58,5 +58,17 @@ namespace VaultUI.Services
         {
             await _vaultRepository.PutInsuranceAsync(id, insurance);
         }
+        public async Task DeleteBeneficiaryAsync(long id)
+        {
+            await _vaultRepository.DeleteBeneficiaryAsync(id);
+        }
+        public async Task DeleteAccountAsync(long id)
+        {
+            await _vaultRepository.DeleteAccountAsync(id);
+        }
+        public async Task DeleteInsuranceAsync(long id)
+        {
+            await _vaultRepository.DeleteInsuranceAsync(id);
+        }
     }
 }

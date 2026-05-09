@@ -44,5 +44,10 @@ namespace VaultUI.Http
         {
             await _httpClient.PutAsJsonAsync(url, data);
         }
+
+        public async Task DeleteAync<TRequest>(string url)
+        {
+            await _httpClient.DeleteAsync(url); 
+        }
     }
 }

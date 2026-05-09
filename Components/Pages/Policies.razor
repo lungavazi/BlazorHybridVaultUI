@@ -22,6 +22,10 @@
             {
                 <MudListItem Text="@policy.Name" SecondaryText="@policy.InsuranceType" Icon="@Icons.Material.Filled.Policy" OnClick="@(() => EditPolicy(policy))">
                 <MudHighlighter Text="@policy.Name" HighlightedText="@searchString"></MudHighlighter>
+                        <MudMenu Icon="@Icons.Material.Filled.Settings"
+                                 Color="Color.Tertiary">
+                            <MudMenuItem Label="Remove" Icon="@Icons.Material.Filled.Delete" OnClick="@(() => DeleteInsuranceAsync(policy.Id))" />
+                        </MudMenu>
                 </MudListItem>
             }
         </MudList>
@@ -47,6 +51,10 @@
         var options = new DialogOptions() { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center };
         var dialog = await DialogService.ShowAsync<Policy>("Edit Policy", parameters, options);
 
+    }
+    public async Task DeleteInsuranceAsync(long id)
+    {
+        await VaultService.DeleteInsuranceAsync(id);
     }
     public async Task AddPolicyAsync()
     {
