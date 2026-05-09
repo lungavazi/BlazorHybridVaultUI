@@ -7,10 +7,17 @@
 	<MudPaper Class="pa-4">
             <MudGrid>
                 <MudContainer Class="mt-6">
-				<MudAlert Severity="Severity.Success" ContentAlignment="HorizontalAlignment.Start">@LastStatusText
+					<MudPaper Class="pa-16 ma-2" Elevation="3">
+						<MudAlert Severity="Severity.Success" ContentAlignment="HorizontalAlignment.Start">
+							@LastStatusText
+
+							<MudFab Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Sync" Size="Size.Small" OnClick="ResyncStatus" />
+						</MudAlert>
+					</MudPaper>
+				@* <MudAlert Severity="Severity.Success" ContentAlignment="HorizontalAlignment.Start">@LastStatusText
 
 					<MudFab Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Sync" Size="Size.Small" OnClick="ResyncStatus"/>
-                        </MudAlert>
+                        </MudAlert> *@
                     </MudContainer>
 		</MudGrid>
 		<MudGrid>
@@ -22,7 +29,9 @@
 					<MudCardHeader>
 						<CardHeaderContent>
 							<MudIcon Icon="@Icons.Material.Filled.Policy"/>
-							<MudText Typo="Typo.h6">Insurance Policies</MudText>
+								<MudText Typo="Typo.h6">Insurance Policies</MudText>
+								<MudText Typo="Typo.body2">List insurers and policy numbers</MudText>
+								<MudText Typo="Typo.body2">so your family knows where to go.</MudText>
 						</CardHeaderContent>
 					</MudCardHeader>
 					<MudCardContent>
@@ -35,8 +44,10 @@
 				         Style="color:cornflowerblue">
 					<MudCardHeader>
 						<CardHeaderContent>
-							<MudIcon Icon="@Icons.Material.Filled.CommentBank"/>
-							<MudText Typo="Typo.h6">Bank & Accounts</MudText>
+								<MudIcon Icon="@Icons.Material.Filled.AccountBalance" />
+								<MudText Typo="Typo.h6">Bank & Accounts</MudText>
+								<MudText Typo="Typo.body2">List banks and accounts references</MudText>
+								<MudText Typo="Typo.body2">so your family can find them.</MudText>
 						</CardHeaderContent>
 					</MudCardHeader>
 					<MudCardContent>
@@ -50,7 +61,8 @@
 					<MudCardHeader>
 						<CardHeaderContent>
 							<MudIcon Icon="@Icons.Material.Filled.People"/>
-							<MudText Typo="Typo.h6">Beneficiaries</MudText>
+								<MudText Typo="Typo.h6">Beneficiaries</MudText>
+								<MudText Typo="Typo.body2">Identify the people connected to your affairs.</MudText>
 						</CardHeaderContent>
 					</MudCardHeader>
 					<MudCardContent>
@@ -66,8 +78,10 @@
 				         Style="color:burlywood">
 					<MudCardHeader>
 						<CardHeaderContent>
-							<MudIcon Icon="@Icons.Material.Filled.DevicesOther"/>
-							<MudText Typo="Typo.h6">Other</MudText>
+							<MudIcon Icon="@Icons.Material.Filled.Drafts"/>
+								<MudText Typo="Typo.h6">Wills & Estate</MudText>
+								<MudText Typo="Typo.body2">Let your family know where your will is kept</MudText>
+								<MudText Typo="Typo.body2">and manages is it.</MudText>
 						</CardHeaderContent>
 					</MudCardHeader>
 					<MudCardContent>

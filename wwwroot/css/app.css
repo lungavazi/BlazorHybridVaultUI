@@ -94,3 +94,41 @@ h1:focus {
     padding-top: 70px;
 }
 
+
+/* 1. Force the Tab bar to be exactly 100% width with no scrolling */
+/*.custom-bottom-tabs .mud-tabs-tabbar-inner {
+    display: flex !important;
+    width: 100% !important;
+    justify-content: space-evenly !important;
+}*/
+
+/* 2. Strip ALL default spacing and force equal sizing */
+/*.custom-bottom-tabs .mud-tab {
+    flex-direction: column !important;
+    padding: 2px 0px !important;*/ /* Zero horizontal padding */
+    /*min-width: 0 !important;*/ /* Removes MudBlazor's 160px min-width */
+    /*flex: 1 !important;*/ /* Each tab gets exactly 1/6th of screen */
+    /*height: 48px !important;*/ /* Slimmer bar height */
+/*}*/
+
+/* 3. The "Micro-Font" settings */
+/*.custom-bottom-tabs .mud-tab-item-text {
+    font-size: 9px !important;*/ /* Absolute minimum for legibility */
+    /*font-weight: 400;
+    line-height: 1;
+    margin-top: 1px;
+    text-transform: none !important;*/ /* Uppercase is too wide */
+    /*letter-spacing: -0.2px;*/ /* Tighten characters */
+/*}*/
+
+/* 4. Scale down icons slightly */
+/*.custom-bottom-tabs .mud-icon-root {
+    font-size: 1.1rem !important;
+    margin-bottom: 0px !important;
+}*/
+
+/* 5. Hide the selection slider (optional) */
+/* This saves vertical space and looks cleaner on mobile */
+/*.custom-bottom-tabs .mud-tab-slider {
+    height: 2px !important;
+}*/

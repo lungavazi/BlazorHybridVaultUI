@@ -18,8 +18,12 @@
 
             @foreach (var account in AccountsDto)
             {
-                <MudListItem Text="@account.Name" SecondaryText="@account.AccountType" Icon="@Icons.Material.Filled.CommentBank" OnClick="@(() => EditAccount(account))">
+                    <MudListItem Text="@account.Name" SecondaryText="@account.AccountType" Icon="@Icons.Material.Filled.AccountBalance" OnClick="@(() => EditAccount(account))">
                     <MudHighlighter Text="@account.Name" HighlightedText="@searchString"></MudHighlighter>
+                        <MudMenu Icon="@Icons.Material.Filled.Settings"
+                                 Color="Color.Tertiary">
+                            <MudMenuItem Label="Remove" Icon="@Icons.Material.Filled.Delete" OnClick="@(() => DeleteAccountAsync(account.Id))" />
+                        </MudMenu>
                 </MudListItem>
             }
         </MudList>
@@ -42,11 +46,15 @@
         if (!result.Canceled)
         {
             // if (result.Data is AccountModel data)
-                // if (data != null)
-                    // var accountToUpdate = AccountsDto.FirstOrDefault(x => x.Id == data.Id);
+            // if (data != null)
+            // var accountToUpdate = AccountsDto.FirstOrDefault(x => x.Id == data.Id);
 
         }
 
+    }
+    public async Task DeleteAccountAsync(long Id)
+    {
+        await VaultService.DeleteAccountAsync(Id);
     }
     public async Task AddAccountAsync()
     {

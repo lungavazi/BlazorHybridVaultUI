@@ -1,6 +1,5 @@
 ﻿
 using VaultUI.Data.Dto;
-using VaultUI.Helpers;
 using VaultUI.Http;
 
 namespace VaultUI.Repository
@@ -71,5 +70,21 @@ namespace VaultUI.Repository
         {
             await _apiClient.PutAsync($"insurance/{id}", insurance);
         }
+
+        public async Task DeleteBeneficiaryAsync(long id)
+        {
+            await _apiClient.DeleteAync<long>($"beneficiary/{id}");
+        }
+
+        public async Task DeleteAccountAsync(long id)
+        {
+            await _apiClient.DeleteAync<long>($"account/{id}");
+        }
+
+        public async Task DeleteInsuranceAsync(long id)
+        {
+            await _apiClient.DeleteAync<long>($"insurance/{id}");
+        }
+
     }
 }

@@ -15,5 +15,8 @@ namespace VaultUI.Repository
         Task PutBeneficiaryAsync(long id, BeneficiaryUpdateDto beneficiry);
         Task PutAccountAsync(long id, AccountUpdateDto account);
         Task PutInsuranceAsync(long id, InsuranceUpdateDto insurance);
+        Task DeleteBeneficiaryAsync(long id);
+        Task DeleteAccountAsync(long id);
+        Task DeleteInsuranceAsync(long id);
     }
 }
