@@ -22,16 +22,16 @@
                 <MudListItem Icon="@Icons.Material.Filled.People"
                      OnClick="@(() => EditBeneficiary(beneficiary))">
             <MudHighlighter Text="@beneficiary.Name"
-                            HighlightedText="@searchString" />
+                                        HighlightedText="@searchString" />
+                        <MudMenu Icon="@Icons.Material.Filled.Settings"
+                                 Color="Color.Tertiary">
+                            <MudMenuItem Label="Remove"
+                                         Icon="@Icons.Material.Filled.Delete"
+                                         OnClick="@(() => DeleteBeneficiaryAsync(beneficiary.Id))" />
+                        </MudMenu>
             <MudText Typo="Typo.body2">
                 @beneficiary.Relationship
             </MudText>
-            <MudMenu Icon="@Icons.Material.Filled.Settings"
-                     Color="Color.Tertiary">
-                <MudMenuItem Label="Remove"
-                              Icon="@Icons.Material.Filled.Delete"
-                              OnClick="@(() => DeleteBeneficiaryAsync(beneficiary.Id))" />
-            </MudMenu>
         </MudListItem>
         }
 </MudList>

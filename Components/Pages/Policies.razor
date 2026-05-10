@@ -23,16 +23,15 @@
                     OnClick="@(() => EditPolicy(policy))">
                         <MudHighlighter Text="@policy.Name"
                         HighlightedText="@searchString" />
-
+                        <MudMenu Icon="@Icons.Material.Filled.Settings"
+                                 Color="Color.Tertiary">
+                            <MudMenuItem Label="Remove"
+                                         Icon="@Icons.Material.Filled.Delete"
+                                         OnClick="@(() => DeleteInsuranceAsync(policy.Id))" />
+                        </MudMenu>
                         <MudText Typo="Typo.body2">
                             @policy.InsuranceType
                         </MudText>
-                        <MudMenu Icon="@Icons.Material.Filled.Settings"
-                        Color="Color.Tertiary">
-                            <MudMenuItem Label="Remove"
-                            Icon="@Icons.Material.Filled.Delete"
-                            OnClick="@(() => DeleteInsuranceAsync(policy.Id))" />
-                        </MudMenu>
                     </MudListItem>
                 }
             </MudList>
