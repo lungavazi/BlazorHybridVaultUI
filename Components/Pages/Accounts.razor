@@ -15,15 +15,21 @@
                           FullWidth="true"
                           @onkeydown="HandleKeyDown"/>
         <MudList T="string">
-
-            @foreach (var account in AccountsDto)
+            @foreach (var account in AccountsDto.Values)
             {
-                    <MudListItem Text="@account.Name" SecondaryText="@account.AccountType" Icon="@Icons.Material.Filled.AccountBalance" OnClick="@(() => EditAccount(account))">
-                    <MudHighlighter Text="@account.Name" HighlightedText="@searchString"></MudHighlighter>
-                        <MudMenu Icon="@Icons.Material.Filled.Settings"
-                                 Color="Color.Tertiary">
-                            <MudMenuItem Label="Remove" Icon="@Icons.Material.Filled.Delete" OnClick="@(() => DeleteAccountAsync(account.Id))" />
-                        </MudMenu>
+                <MudListItem Icon="@Icons.Material.Filled.AccountBalance"
+                             OnClick="@(() => EditAccount(account))">
+                    <MudHighlighter Text="@account.Name"
+                                    HighlightedText="@searchString" />
+                    <MudText Typo="Typo.body2">
+                        @account.AccountType
+                    </MudText>
+                    <MudMenu Icon="@Icons.Material.Filled.Settings"
+                             Color="Color.Tertiary">
+                        <MudMenuItem Label="Remove"
+                                      Icon="@Icons.Material.Filled.Delete"
+                                      OnClick="@(() => DeleteAccountAsync(account.Id))" />
+                    </MudMenu>
                 </MudListItem>
             }
         </MudList>
@@ -45,16 +51,17 @@
 
         if (!result.Canceled)
         {
-            // if (result.Data is AccountModel data)
-            // if (data != null)
-            // var accountToUpdate = AccountsDto.FirstOrDefault(x => x.Id == data.Id);
-
+            if (result.Data is AccountDto data && data != null)
+            {
+                AccountsDto[data.Id]= data;
+            }
         }
 
     }
     public async Task DeleteAccountAsync(long Id)
     {
         await VaultService.DeleteAccountAsync(Id);
+        AccountsDto.Remove(Id); 
     }
     public async Task AddAccountAsync()
     {
@@ -64,10 +71,10 @@
 
         if (!result.Canceled)
         {
-            if (result.Data is AccountDto data)
-                if (data != null)
-                    AccountsDto.Select(x => x.Id == data.Id);
-
+            if (result.Data is AccountDto data && data != null)
+            {
+                AccountsDto.Add(data.Id,  data);
+            }
         }
     }
     private async Task HandleKeyDown(KeyboardEventArgs e)
@@ -96,7 +103,8 @@
 
     private async Task RefreshAccounts()
     {
-        AccountsDto = await VaultService.GetAccoutsAsync("lunga@gmail.com", searchString);
+        var accounts = await VaultService.GetAccoutsAsync("lunga@gmail.com", searchString);
+        AccountsDto = accounts.ToDictionary(a => a.Id);
     }
-    private IEnumerable<AccountDto> AccountsDto = new List<AccountDto>();
+    private Dictionary<long, AccountDto> AccountsDto = new();
 }

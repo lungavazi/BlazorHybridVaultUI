@@ -17,15 +17,22 @@
                           FullWidth="true"
                       @onkeydown="HandleKeyDownAsync" />
             <MudList T="BeneficiaryDto">
-            @foreach (var beneficiary in BeneficiariesDto)
+            @foreach (var beneficiary in BeneficiariesDto.Values)
         {
-                <MudListItem Text="@beneficiary.Name" SecondaryText="@beneficiary.Relationship" Icon="@Icons.Material.Filled.People" OnClick="@(() => EditBeneficiary(beneficiary))">
-                    <MudHighlighter Text="@beneficiary.Name" HighlightedText="@searchString"></MudHighlighter>
-                        <MudMenu Icon="@Icons.Material.Filled.Settings"
-                                 Color="Color.Tertiary">
-                            <MudMenuItem Label="Remove" Icon="@Icons.Material.Filled.Delete" OnClick="@(() => DeleteBeneficiaryAsync(beneficiary.Id))" />
-                        </MudMenu>
-                </MudListItem>
+                <MudListItem Icon="@Icons.Material.Filled.People"
+                     OnClick="@(() => EditBeneficiary(beneficiary))">
+            <MudHighlighter Text="@beneficiary.Name"
+                            HighlightedText="@searchString" />
+            <MudText Typo="Typo.body2">
+                @beneficiary.Relationship
+            </MudText>
+            <MudMenu Icon="@Icons.Material.Filled.Settings"
+                     Color="Color.Tertiary">
+                <MudMenuItem Label="Remove"
+                              Icon="@Icons.Material.Filled.Delete"
+                              OnClick="@(() => DeleteBeneficiaryAsync(beneficiary.Id))" />
+            </MudMenu>
+        </MudListItem>
         }
 </MudList>
 </MudPaper>
@@ -43,14 +50,23 @@
         var options = new DialogOptions() { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center };
         var dialog = await DialogService.ShowAsync<Beneficiary>("Edit Beneficiary", parameters, options);
         var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            if (result.Data is BeneficiaryDto data && data != null)
+            {
+                BeneficiariesDto[data.Id] =  data;
+            }
+        }
     }
 
     public async Task DeleteBeneficiaryAsync(long id)
     {
         await VaultService.DeleteBeneficiaryAsync(id);
+        BeneficiariesDto.Remove(id);
     }
     string searchString = "";
-    public IEnumerable<BeneficiaryDto> BeneficiariesDto = new List<BeneficiaryDto>();
+    public Dictionary<long, BeneficiaryDto> BeneficiariesDto = new();
     private async Task HandleKeyDownAsync(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
@@ -67,13 +83,16 @@
 
         if (!result.Canceled)
         {
+            if (result.Data is BeneficiaryDto data && data != null)
+            {
+                BeneficiariesDto.Add(data.Id, data);
+            }
         }
     }
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            // await base.OnInitializedAsync();
             Loader.IsLoading = true;
             await RefreshBenefeciaries();
 
@@ -87,7 +106,8 @@
     }
     private async Task RefreshBenefeciaries()
     {
-        BeneficiariesDto = await VaultService.GetBeneficiariesAsync("lunga@gmail.com", searchString);
+        var beneficiaries = await VaultService.GetBeneficiariesAsync("lunga@gmail.com", searchString);
+        BeneficiariesDto = beneficiaries.ToDictionary(b => b.Id);
     }
 
 }
