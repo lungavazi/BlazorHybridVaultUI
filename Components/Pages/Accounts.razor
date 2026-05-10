@@ -20,16 +20,16 @@
                 <MudListItem Icon="@Icons.Material.Filled.AccountBalance"
                              OnClick="@(() => EditAccount(account))">
                     <MudHighlighter Text="@account.Name"
-                                    HighlightedText="@searchString" />
+                                        HighlightedText="@searchString" />
+                        <MudMenu Icon="@Icons.Material.Filled.Settings"
+                                 Color="Color.Tertiary">
+                            <MudMenuItem Label="Remove"
+                                         Icon="@Icons.Material.Filled.Delete"
+                                         OnClick="@(() => DeleteAccountAsync(account.Id))" />
+                        </MudMenu>
                     <MudText Typo="Typo.body2">
                         @account.AccountType
                     </MudText>
-                    <MudMenu Icon="@Icons.Material.Filled.Settings"
-                             Color="Color.Tertiary">
-                        <MudMenuItem Label="Remove"
-                                      Icon="@Icons.Material.Filled.Delete"
-                                      OnClick="@(() => DeleteAccountAsync(account.Id))" />
-                    </MudMenu>
                 </MudListItem>
             }
         </MudList>
