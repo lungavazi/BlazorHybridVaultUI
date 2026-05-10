@@ -69,10 +69,11 @@
         else
         {
             var policyId = await CreatePolicyAsync();
-            model = policyId > 0 ? new PolicyModel() : model;
+            model.Id = policyId;
+            model = policyId > 0 ? model : new PolicyModel();
             Snackbar.Add(policyId > 0 ? "Policy created successfully" : "Error occurred.");
         }
-        MudDialog?.Close(DialogResult.Ok(model));
+        MudDialog?.Close(DialogResult.Ok(new PolicyDto { Id = model.Id, BeneficiaryId = model.BeneficiaryId, DateOpened = model.DateOpened, InsuranceNo = model.InsuranceNo, InsuranceType = model.InsuranceType, Name = model.Name }));
     }
 
     private async Task<long> CreatePolicyAsync()

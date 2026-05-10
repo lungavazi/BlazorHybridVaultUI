@@ -16,14 +16,14 @@
     <MudAppBar Color="Color.Tertiary" Fixed="true" > 
         <MudIconButton Icon="@Icons.Material.Filled.ManageAccounts" OnClick="GrawerToggle" Color="Color.Inherit" />
         <MudSpacer />
-        <MudChip T="string" Icon="@Icons.Material.Filled.Subscriptions" Color="Color.Secondary">Not Subscribed</MudChip>
+        <MudChip T="string" Icon="@Icons.Material.Filled.Subscriptions" Color="Color.Warning">Monitoring not activated</MudChip>
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen" Variant="DrawerVariant.Temporary">
         <Profile />
     </MudDrawer>
             <MudTabs Position="Position.Bottom" Rounded="false" MinimumTabWidth="60px" Elevation="0" PanelClass="pa-0" SliderColor="Color.Tertiary">
         <MudTabPanel Icon="@Icons.Material.Filled.Dashboard" IconColor="Color.Tertiary">
-                        <Dashboard/>
+            <Dashboard />
                     </MudTabPanel>
                 <MudTabPanel Icon="@Icons.Material.Filled.Policy" IconColor="Color.Tertiary">
                 @* <MudTabPanel Icon="@Icons.Material.Filled.Policy" IconColor="Color.Tertiary" Text="Policies"> *@

@@ -6,19 +6,16 @@
 	<MudContainer MaxWidth="MaxWidth.Medium">
 	<MudPaper Class="pa-4">
             <MudGrid>
-                <MudContainer Class="mt-6">
-					<MudPaper Class="pa-16 ma-2" Elevation="3">
-						<MudAlert Severity="Severity.Success" ContentAlignment="HorizontalAlignment.Start">
-							@LastStatusText
-
-							<MudFab Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Sync" Size="Size.Small" OnClick="ResyncStatus" />
-						</MudAlert>
+				<MudItem xs="12">
+					<MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+						<MudFab StartIcon="@Icons.Material.Filled.NotificationsActive" Label="Activate Monitoring" Color="Color.Tertiary" />
 					</MudPaper>
-				@* <MudAlert Severity="Severity.Success" ContentAlignment="HorizontalAlignment.Start">@LastStatusText
-
-					<MudFab Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Sync" Size="Size.Small" OnClick="ResyncStatus"/>
-                        </MudAlert> *@
-                    </MudContainer>
+                    <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+                        <MudAlert Severity="Severity.Warning" ContentAlignment="HorizontalAlignment.Start">
+                            @LastStatusText
+						</MudAlert>
+                    </MudPaper>
+				</MudItem>
 		</MudGrid>
 		<MudGrid>
 			<MudItem xs="12">

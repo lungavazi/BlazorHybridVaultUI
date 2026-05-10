@@ -1,5 +1,4 @@
 ﻿@page "/account"
-@* @inject IHttpClientFactory ClientFactory *@
 @inject ISnackbar Snackbar
 @using MudBlazor
 @inject VaultService VaultService
@@ -71,7 +70,7 @@
             model = accoundId > 0 ? new AccountModel() : model;
             Snackbar.Add(accoundId > 0 ? "Account created successfully" : "Error occurred.");
         }
-        MudDialog?.Close(DialogResult.Ok(model));
+        MudDialog?.Close(DialogResult.Ok(new AccountDto { AccountNo = model.AccountNo, AccountType = model.AccountType, BeneficiaryId = model.BeneficiaryId, DateOpened = model.DateOpened, Id = model.Id, Name = model.Name }));
     }
     private async Task<long> CreateAccountAsync()
     {

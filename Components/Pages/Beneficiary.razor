@@ -39,7 +39,6 @@
 
     private Task OnValidSubmit(EditContext context)
     {
-        // StateHasChanged();
         return Save();
     }
     private async Task Save()
@@ -52,10 +51,11 @@
         else
         {
             var beneficiaryID = await CreateBeneficiaryAsync();
-            model = beneficiaryID > 0 ? new BeneficiaryModel() : model;
+            model = beneficiaryID > 0 ? model : new BeneficiaryModel();
+            model.Id = beneficiaryID;
             Snackbar.Add(beneficiaryID > 0 ? "Beneficiary created successfully" : "Error occurred.");
         }
-        MudDialog?.Close(DialogResult.Ok(model));
+        MudDialog?.Close(DialogResult.Ok(new BeneficiaryDto { Address = model.Address, DateOfBirth = model.DateOfBirth.ToShortDateString(), CellNo = model.CellPhone, Email = model.Email, Id = model.Id, Name = model.Name, Relationship = model.Relationship, SecondaryEmail = model.Email, SecondaryTelephone = model.CellPhone }));
     }
     protected override async Task OnInitializedAsync()
     {

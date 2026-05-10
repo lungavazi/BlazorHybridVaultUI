@@ -17,18 +17,25 @@
                           FullWidth="true"
                       @onkeydown="HandleKeyDownAsync" />
         <MudList T="string">
+                @foreach (var policy in PoliciesDto.Values)
+                {
+                    <MudListItem Icon="@Icons.Material.Filled.Policy"
+                    OnClick="@(() => EditPolicy(policy))">
+                        <MudHighlighter Text="@policy.Name"
+                        HighlightedText="@searchString" />
 
-            @foreach (var policy in PoliciesDto)
-            {
-                <MudListItem Text="@policy.Name" SecondaryText="@policy.InsuranceType" Icon="@Icons.Material.Filled.Policy" OnClick="@(() => EditPolicy(policy))">
-                <MudHighlighter Text="@policy.Name" HighlightedText="@searchString"></MudHighlighter>
+                        <MudText Typo="Typo.body2">
+                            @policy.InsuranceType
+                        </MudText>
                         <MudMenu Icon="@Icons.Material.Filled.Settings"
-                                 Color="Color.Tertiary">
-                            <MudMenuItem Label="Remove" Icon="@Icons.Material.Filled.Delete" OnClick="@(() => DeleteInsuranceAsync(policy.Id))" />
+                        Color="Color.Tertiary">
+                            <MudMenuItem Label="Remove"
+                            Icon="@Icons.Material.Filled.Delete"
+                            OnClick="@(() => DeleteInsuranceAsync(policy.Id))" />
                         </MudMenu>
-                </MudListItem>
-            }
-        </MudList>
+                    </MudListItem>
+                }
+            </MudList>
 </MudPaper>
 </MudContainer>
 </div>
@@ -50,11 +57,21 @@
 
         var options = new DialogOptions() { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center };
         var dialog = await DialogService.ShowAsync<Policy>("Edit Policy", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            if (result.Data is PolicyDto data)
+            {
+                PoliciesDto[data.Id]= data;
+            }
+        }
 
     }
     public async Task DeleteInsuranceAsync(long id)
     {
         await VaultService.DeleteInsuranceAsync(id);
+        PoliciesDto.Remove(id);
     }
     public async Task AddPolicyAsync()
     {
@@ -64,10 +81,13 @@
 
         if (!result.Canceled)
         {
-
+            if(result.Data is PolicyDto data)
+            {
+                PoliciesDto.Add(data.Id, data);
+            }   
         }
     }
-    public IEnumerable<PolicyDto> PoliciesDto = new List<PolicyDto>();
+    public Dictionary<long, PolicyDto> PoliciesDto = new();
     protected override async Task OnInitializedAsync()
     {
         try
@@ -92,6 +112,7 @@
 
     private async Task RefreshPolicies()
     {
-        PoliciesDto = await VaultService.GetPoliciesAsync("lunga@gmail.com", searchString);
+        var policies = await VaultService.GetPoliciesAsync("lunga@gmail.com", searchString);
+        PoliciesDto = policies.ToDictionary(p => p.Id);
     }
 }
