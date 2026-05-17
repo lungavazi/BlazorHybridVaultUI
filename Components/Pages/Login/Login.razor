@@ -1,0 +1,65 @@
+﻿
+@page "/login"
+@* @rendermode InteractiveWebAssembly *@
+@* @attribute [AllowAnonymous]
+@using VaultUI.Authetnication
+@using VaultUI.Data.Dto.Login *@
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Nav
+@* @inject INavigation NavigationService *@
+@* @inject IAuthApi authApi *@
+
+<div class="dashboard-scroll-container">
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudPaper Height="650px">
+        <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+            <MudGrid>
+                <MudItem xs="12" sm="7">
+                    <MudCard>
+                        <MudCardContent>
+                            <MudTextField Label="User Name" MaxLength="50" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Abc" AdornmentColor="Color.Primary" Immediate="true"
+                                          @bind-Value="model.UserName" For="@(() => model.UserName)" />
+                            <MudTextField Label="Password" Class="mt-3" MaxLength="50"
+                                          @bind-Value="model.Password" For="@(() => model.Password)" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Abc" AdornmentColor="Color.Primary" Immediate="true" />
+
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Login</MudButton>
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </MudPaper>
+</MudContainer>
+</div>
+
+@code {
+    private LoginRequestDto model = new LoginRequestDto();
+
+    private async Task OnValidSubmit(EditContext context)
+    {
+        // StateHasChanged();
+        await LoginAsync(model.UserName, model.Password);
+    }
+    protected override void OnInitialized() =>
+        Nav.LocationChanged += HandleLocationChanged;
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e) =>
+    Console.WriteLine($"URL of new location: {e.Location}");
+
+    public void Dispose() => Nav.LocationChanged -= HandleLocationChanged;
+
+    private async Task LoginAsync(string userName, string password)
+    {
+        ((CustomAuthStateProvider)AuthenticationStateProvider).AuthenticateUser(userName);
+        Nav.NavigateTo("/policies", replace: true); 
+        // await Nav.PopAsync();
+        // var loginResponse = await authApi.LoginAsync(model);
+        // AppAuthStateProvider.Login(loginResponse);
+        // Nav.NavigateTo("/dashboard", replace: true);
+
+    }
+}

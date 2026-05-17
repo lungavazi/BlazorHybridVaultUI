@@ -104,11 +104,6 @@
         }
     }
 
-    public void Dispose()
-    {
-        Loader.OnChange -= StateHasChanged;
-    }
-
     private async Task RefreshPolicies()
     {
         var policies = await VaultService.GetPoliciesAsync("lunga@gmail.com", searchString);

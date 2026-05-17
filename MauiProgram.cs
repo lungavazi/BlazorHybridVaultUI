@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Logging;
 using MudBlazor;
 using MudBlazor.Services;
 using VaultUI.Helpers;
 using VaultUI.Http;
+using VaultUI.Http.Authentication;
 using VaultUI.Repository;
 using VaultUI.Services;
 
@@ -41,6 +44,9 @@ namespace VaultUI
             });
             builder.Services.AddScoped<IVaultRepository, VaultRepository>();
             builder.Services.AddScoped<VaultService>();
+            builder.Services.AddAuthorizationCore();
+            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+            builder.Services.AddScoped<CustomAuthenticationService>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
