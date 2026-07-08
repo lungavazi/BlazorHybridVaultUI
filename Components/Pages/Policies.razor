@@ -2,6 +2,7 @@
 @inject IDialogService DialogService
 @inject LoadingService Loader
 @inject VaultService VaultService
+@inject AuthService AuthService
 
 <div class="dashboard-scroll-container">
 <MudContainer MaxWidth="MaxWidth.Medium">
@@ -111,7 +112,7 @@
 
     private async Task RefreshPolicies()
     {
-        var policies = await VaultService.GetPoliciesAsync("lunga@gmail.com", searchString);
+        var policies = await VaultService.GetPoliciesAsync(AuthService.Email ?? string.Empty, searchString);
         PoliciesDto = policies.ToDictionary(p => p.Id);
     }
 }

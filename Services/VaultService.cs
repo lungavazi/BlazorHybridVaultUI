@@ -1,5 +1,4 @@
 ﻿
-using System.Runtime.CompilerServices;
 using VaultUI.Data.Dto;
 using VaultUI.Repository;
 
@@ -12,6 +11,11 @@ namespace VaultUI.Services
         public VaultService(IVaultRepository vaultRepository)
         {
             _vaultRepository = vaultRepository;
+        }
+
+        public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto loginRequest)
+        {
+            return await _vaultRepository.LoginAsync(loginRequest);
         }
 
         public async Task<IEnumerable<PolicyDto>> GetPoliciesAsync(string username, string policyName)

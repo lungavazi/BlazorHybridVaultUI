@@ -2,6 +2,7 @@
 @inject IDialogService DialogService
 @inject VaultService VaultService
 @inject LoadingService Loader
+@inject AuthService AuthService
 <div class="dashboard-scroll-container">
 <MudContainer MaxWidth="MaxWidth.Medium">
     <MudPaper>
@@ -103,7 +104,7 @@
 
     private async Task RefreshAccounts()
     {
-        var accounts = await VaultService.GetAccoutsAsync("lunga@gmail.com", searchString);
+        var accounts = await VaultService.GetAccoutsAsync(AuthService.Email ?? string.Empty, searchString);
         AccountsDto = accounts.ToDictionary(a => a.Id);
     }
     private Dictionary<long, AccountDto> AccountsDto = new();

@@ -1,6 +1,7 @@
 ﻿@page "/wills"
 @using VaultUI.Data.Dto
 @inject IHttpClientFactory ClientFactory
+@inject AuthService AuthService
 
 <div class="dashboard-scroll-container">
 <MudContainer MaxWidth="MaxWidth.Medium">
@@ -35,7 +36,7 @@
         {
             await base.OnInitializedAsync();
 
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/others/{"lunga@gmail.com"}");
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/others/{AuthService.Email ?? string.Empty}");
 
             var httpClient = ClientFactory.CreateClient();
             using var response = await httpClient.SendAsync(request);

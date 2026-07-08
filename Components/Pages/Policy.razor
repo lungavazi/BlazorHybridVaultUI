@@ -1,6 +1,7 @@
 ﻿@page "/policy"
 @inject ISnackbar Snackbar
 @inject VaultService VaultService
+@inject AuthService AuthService
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
@@ -53,7 +54,7 @@
             model.InsuranceNo = PolicyEditDto.InsuranceNo;
         }
 
-        beneficiaries = await VaultService.GetBeneficiariesAsync("lunga@gmail.com", null);
+        beneficiaries = await VaultService.GetBeneficiariesAsync(AuthService.Email ?? string.Empty, null);
     }
     private async Task OnValidSubmit(EditContext context)
     {
@@ -80,7 +81,7 @@
     {
         try
         {
-            var policyDto = new InsuranceCreateDto { Name = model.Name, UserName = "lunga@gmail.com", BeneficiaryId = model.BeneficiaryId, InsuranceType = model.InsuranceType, InsuranceNo = model.InsuranceNo, DateOpened = model.DateOpened };
+            var policyDto = new InsuranceCreateDto { Name = model.Name, UserName = AuthService.Email ?? string.Empty, BeneficiaryId = model.BeneficiaryId, InsuranceType = model.InsuranceType, InsuranceNo = model.InsuranceNo, DateOpened = model.DateOpened };
 
             var insuranceId = await VaultService.CreateInsuranceAsync(policyDto);
             return insuranceId;

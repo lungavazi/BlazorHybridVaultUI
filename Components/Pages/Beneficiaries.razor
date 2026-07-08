@@ -3,6 +3,7 @@
 @inject IDialogService DialogService
 @inject VaultService VaultService
 @inject LoadingService Loader
+@inject AuthService AuthService
 
 <div class="dashboard-scroll-container">
 <MudContainer MaxWidth="MaxWidth.Medium">
@@ -106,7 +107,7 @@
     }
     private async Task RefreshBenefeciaries()
     {
-        var beneficiaries = await VaultService.GetBeneficiariesAsync("lunga@gmail.com", searchString);
+        var beneficiaries = await VaultService.GetBeneficiariesAsync(AuthService.Email ?? string.Empty, searchString);
         BeneficiariesDto = beneficiaries.ToDictionary(b => b.Id);
     }
 
