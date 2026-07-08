@@ -12,6 +12,11 @@ namespace VaultUI.Repository
         {
             _apiClient = apiClient;
         }
+        public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto loginRequest)
+        {
+            return await _apiClient.PostAsync<LoginRequestDto, LoginResponseDto>("auth/login", loginRequest);
+        }
+
         public async Task<IEnumerable<AccountDto>> GetAccountsAsync(string userName, string accountName)
         {
             var result = await _apiClient.GetAsync<IEnumerable<AccountDto>>($"accounts/{userName}?accountName={accountName}");

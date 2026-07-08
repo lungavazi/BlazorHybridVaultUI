@@ -2,6 +2,7 @@
 @inject ISnackbar Snackbar
 @using MudBlazor
 @inject VaultService VaultService
+@inject AuthService AuthService
     <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
         <DataAnnotationsValidator />
         <MudGrid>
@@ -50,7 +51,7 @@
             model.Name = AccountEditDto.Name;
             model.DateOpened = AccountEditDto.DateOpened;
         }
-        beneficiaries = await VaultService.GetBeneficiariesAsync("lunga@gmail.com", null);
+        beneficiaries = await VaultService.GetBeneficiariesAsync(AuthService.Email ?? string.Empty, null);
     }
     private Task OnValidSubmit(EditContext context)
     {
@@ -78,7 +79,7 @@
         {
             AccountCreateDto accountDto = new AccountCreateDto();
             accountDto.Name = model.Name;
-            accountDto.UserName = "lunga@gmail.com";
+            accountDto.UserName = AuthService.Email ?? string.Empty;
             accountDto.BeneficiaryId = model.BeneficiaryId;
             accountDto.AccountType = model.AccountType;
             accountDto.AccountNo = model.AccountNo;

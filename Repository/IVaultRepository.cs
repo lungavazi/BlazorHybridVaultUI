@@ -4,6 +4,7 @@ namespace VaultUI.Repository
 {
     public interface IVaultRepository
     {
+        Task<LoginResponseDto?> LoginAsync(LoginRequestDto loginRequest);
         Task<IEnumerable<PolicyDto>> GetPoliciesAsync(string userName, string policyName);
         Task<IEnumerable<BeneficiaryDto>> GetBeneficiariesAsync(string userName, string beneficiaryName);
         Task<IEnumerable<AccountDto>> GetAccountsAsync(string userName, string accountName);

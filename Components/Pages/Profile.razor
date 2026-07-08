@@ -1,6 +1,7 @@
 ﻿@page "/profile"
 @using VaultUI.Data.Dto
 @inject VaultService VaultService
+@inject AuthService AuthService
 <MudLayout>
     <MudMainContent Class="content-with-fab">
     <MudTextField @bind-Value="ReadOnly" @bind-Label="AppVer" ReadOnly="true" Variant="Variant.Filled" />
@@ -56,7 +57,7 @@
         {
             await base.OnInitializedAsync();
 
-            user = await VaultService.GetUserInfoAsync("lunga@gmail.com");
+            user = await VaultService.GetUserInfoAsync(AuthService.Email ?? string.Empty);
 
                 if (user != null)
                     InitializeUserFields(user);
