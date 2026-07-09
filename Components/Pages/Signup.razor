@@ -1,0 +1,219 @@
+@page "/signup"
+@inject VaultService VaultService
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center justify-center" Style="min-height: 100vh;">
+    <MudPaper Class="pa-8 ma-4" Elevation="4" Style="width: 100%;">
+
+        <div class="d-flex flex-column align-center mb-6">
+            <MudIcon Icon="@Icons.Material.Filled.PersonAdd"
+                     Color="Color.Tertiary"
+                     Style="font-size: 3rem;" />
+            <MudText Typo="Typo.h5" Class="mt-2" Align="Align.Center">
+                Create Account
+            </MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                Join Vault Legacy
+            </MudText>
+        </div>
+
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Class="mb-4" Dense="true">
+                @_errorMessage
+            </MudAlert>
+        }
+
+        @if (!string.IsNullOrEmpty(_successMessage))
+        {
+            <MudAlert Severity="Severity.Success" Class="mb-4" Dense="true">
+                @_successMessage
+            </MudAlert>
+        }
+
+        <MudTextField @bind-Value="_username"
+                      Label="Email"
+                      Variant="Variant.Outlined"
+                      InputType="InputType.Email"
+                      FullWidth="true"
+                      Class="mb-4"
+                      Disabled="_isLoading" />
+
+        <MudTextField @bind-Value="_idNumber"
+                      Label="ID Number"
+                      Variant="Variant.Outlined"
+                      FullWidth="true"
+                      Class="mb-4"
+                      Disabled="_isLoading" />
+
+        <MudTextField @bind-Value="_name"
+                      Label="Name"
+                      Variant="Variant.Outlined"
+                      FullWidth="true"
+                      Class="mb-4"
+                      Disabled="_isLoading" />
+
+        <MudTextField @bind-Value="_surname"
+                      Label="Surname"
+                      Variant="Variant.Outlined"
+                      FullWidth="true"
+                      Class="mb-4"
+                      Disabled="_isLoading" />
+
+        <MudTextField @bind-Value="_cellPhone"
+                      Label="Cell Phone"
+                      Variant="Variant.Outlined"
+                      FullWidth="true"
+                      Class="mb-4"
+                      Disabled="_isLoading" />
+
+        <MudTextField @bind-Value="_password"
+                      Label="Password"
+                      Variant="Variant.Outlined"
+                      InputType="@_passwordInputType"
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@_passwordIcon"
+                      OnAdornmentClick="TogglePasswordVisibility"
+                      FullWidth="true"
+                      Class="mb-4"
+                      Disabled="_isLoading" />
+
+        <MudTextField @bind-Value="_confirmPassword"
+                      Label="Confirm Password"
+                      Variant="Variant.Outlined"
+                      InputType="@_confirmPasswordInputType"
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@_confirmPasswordIcon"
+                      OnAdornmentClick="ToggleConfirmPasswordVisibility"
+                      FullWidth="true"
+                      Class="mb-6"
+                      Disabled="_isLoading" />
+
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Tertiary"
+                   FullWidth="true"
+                   Size="Size.Large"
+                   OnClick="SignUpAsync"
+                   Disabled="_isLoading"
+                   Class="mb-4">
+            @if (_isLoading)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                <span>Creating Account...</span>
+            }
+            else
+            {
+                <span>Sign Up</span>
+            }
+        </MudButton>
+
+        <MudText Align="Align.Center" Typo="Typo.body2">
+            Already have an account?
+            <MudLink Href="/login" Disabled="_isLoading">
+                Sign In
+            </MudLink>
+        </MudText>
+
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private string _username = string.Empty;
+    private string _idNumber = string.Empty;
+    private string _name = string.Empty;
+    private string _surname = string.Empty;
+    private string _cellPhone = string.Empty;
+    private string _password = string.Empty;
+    private string _confirmPassword = string.Empty;
+    private string _errorMessage = string.Empty;
+    private string _successMessage = string.Empty;
+    private bool _isLoading = false;
+    private bool _showPassword = false;
+    private bool _showConfirmPassword = false;
+
+    private InputType _passwordInputType => _showPassword ? InputType.Text : InputType.Password;
+    private string _passwordIcon => _showPassword
+        ? Icons.Material.Filled.VisibilityOff
+        : Icons.Material.Filled.Visibility;
+
+    private InputType _confirmPasswordInputType => _showConfirmPassword ? InputType.Text : InputType.Password;
+    private string _confirmPasswordIcon => _showConfirmPassword
+        ? Icons.Material.Filled.VisibilityOff
+        : Icons.Material.Filled.Visibility;
+
+    protected override void OnInitialized()
+    {
+        if (AuthService.IsAuthenticated)
+            Navigation.NavigateTo("/dashboard", replace: true);
+    }
+
+    private void TogglePasswordVisibility() => _showPassword = !_showPassword;
+    private void ToggleConfirmPasswordVisibility() => _showConfirmPassword = !_showConfirmPassword;
+
+    private async Task SignUpAsync()
+    {
+        _errorMessage = string.Empty;
+        _successMessage = string.Empty;
+
+        // Validation
+        if (string.IsNullOrWhiteSpace(_username) ||
+            // string.IsNullOrWhiteSpace(_idNumber) ||
+            string.IsNullOrWhiteSpace(_name) ||
+            string.IsNullOrWhiteSpace(_surname) ||
+            string.IsNullOrWhiteSpace(_cellPhone) ||
+            string.IsNullOrWhiteSpace(_password) ||
+            string.IsNullOrWhiteSpace(_confirmPassword))
+        {
+            _errorMessage = "All fields are required.";
+            return;
+        }
+
+        if (_password != _confirmPassword)
+        {
+            _errorMessage = "Passwords do not match.";
+            return;
+        }
+
+        if (_password.Length < 6)
+        {
+            _errorMessage = "Password must be at least 6 characters long.";
+            return;
+        }
+
+        _isLoading = true;
+
+        try
+        {
+            var signUpRequest = new VaultUI.Data.Dto.SignUpRequestDto
+            {
+                Username = _username.Trim(),
+                IdNumber = _idNumber.Trim(),
+                Name = _name.Trim(),
+                Surname = _surname.Trim(),
+                CellPhone = _cellPhone.Trim(),
+                Password = _password
+            };
+
+            var result = await VaultService.SignUpAsync(signUpRequest);
+
+            if (result is null || !result.Success)
+            {
+                _errorMessage = result?.Message ?? "Sign up failed. Please try again.";
+                return;
+            }
+
+            _successMessage = "Account created successfully! Redirecting to login...";
+            await Task.Delay(2000);
+            Navigation.NavigateTo("/login", replace: true);
+        }
+        catch (Exception)
+        {
+            _errorMessage = "Unable to connect to the server. Please try again later.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

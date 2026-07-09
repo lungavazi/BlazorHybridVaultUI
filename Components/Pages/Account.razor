@@ -68,7 +68,7 @@
         else
         {
             var accoundId = await CreateAccountAsync();
-            model = accoundId > 0 ? new AccountModel() : model;
+            model = accoundId > 0 ? model : new AccountModel();
             Snackbar.Add(accoundId > 0 ? "Account created successfully" : "Error occurred.");
         }
         MudDialog?.Close(DialogResult.Ok(new AccountDto { AccountNo = model.AccountNo, AccountType = model.AccountType, BeneficiaryId = model.BeneficiaryId, DateOpened = model.DateOpened, Id = model.Id, Name = model.Name }));
