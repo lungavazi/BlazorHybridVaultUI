@@ -1,5 +1,4 @@
-﻿
-using VaultUI.Data.Dto;
+﻿using VaultUI.Data.Dto;
 using VaultUI.Http;
 
 namespace VaultUI.Repository
@@ -91,5 +90,9 @@ namespace VaultUI.Repository
             await _apiClient.DeleteAync<long>($"insurance/{id}");
         }
 
+        public async Task<SignUpResponseDto?> SignUpAsync(SignUpRequestDto signUpRequest)
+        {
+            return await _apiClient.PostAsync<SignUpRequestDto, SignUpResponseDto>("auth/register", signUpRequest);
+        }
     }
 }

@@ -1,5 +1,4 @@
-﻿
-using VaultUI.Data.Dto;
+﻿using VaultUI.Data.Dto;
 using VaultUI.Repository;
 
 namespace VaultUI.Services
@@ -73,6 +72,10 @@ namespace VaultUI.Services
         public async Task DeleteInsuranceAsync(long id)
         {
             await _vaultRepository.DeleteInsuranceAsync(id);
+        }
+        public async Task<SignUpResponseDto?> SignUpAsync(SignUpRequestDto signUpRequest)
+        {
+            return await _vaultRepository.SignUpAsync(signUpRequest);
         }
     }
 }

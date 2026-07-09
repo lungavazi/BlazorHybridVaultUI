@@ -65,6 +65,13 @@
             }
         </MudButton>
 
+        <MudText Align="Align.Center" Typo="Typo.body2" Class="mt-4">
+            Don't have an account?
+            <MudLink Href="/signup" Disabled="_isLoading">
+                Sign Up
+            </MudLink>
+        </MudText>
+
     </MudPaper>
 </MudContainer>
 
@@ -124,7 +131,6 @@
 
             // Store the user + set the JWT on the HTTP client
             AuthService.SetUser(result);
-            ApiClient.SetAuthToken(result.Token);
 
             Navigation.NavigateTo("/dashboard", replace: true);
         }
