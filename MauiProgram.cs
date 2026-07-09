@@ -33,13 +33,13 @@ namespace VaultUI
                 
                 );
             builder.Services.AddMauiBlazorWebView();
-            //builder.Services.AddHttpClient();
             builder.Services.AddSingleton<LoadingService>();
             builder.Services.AddSingleton<AuthService>();
+            builder.Services.AddTransient<AuthHeaderHandler>();
             builder.Services.AddHttpClient<ApiClient>(client =>
             {
                 client.BaseAddress = new Uri(Constants.API_URL);
-            });
+            }).AddHttpMessageHandler<AuthHeaderHandler>();
             builder.Services.AddScoped<IVaultRepository, VaultRepository>();
             builder.Services.AddScoped<VaultService>();
 
