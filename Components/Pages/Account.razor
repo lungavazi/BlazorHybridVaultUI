@@ -15,7 +15,9 @@
                                       @bind-Value="model.AccountType" For="@(() => model.AccountType)" />
                         <MudTextField Label="Account No" Class="mt-3" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Numbers" AdornmentColor="Color.Primary" Immediate="true"
                                       @bind-Value="model.AccountNo" For="@(() => model.AccountNo)" />
-                        <MudSelect T="long" Label="Select beneficiary" @bind-Value="model.BeneficiaryId" For="@(() => model.BeneficiaryId)" AdornmentIcon="@Icons.Material.Filled.People" AdornmentColor="Color.Primary" Immediate="true">
+                        <MudSelect T="long" MultiSelection="true" Label="Select beneficiary" SelectedValues="model.BeneficiaryIds" 
+                                   ToStringFunc="@(new Func<long, string>(GetBeneficiaryName))"
+                                   AdornmentIcon="@Icons.Material.Filled.People" AdornmentColor="Color.Primary" Immediate="true" @ref="_beneficiarySelect">
                             @foreach (var beneficiary in beneficiaries)
                             {
                                 <MudSelectItem Value="@beneficiary.Id">@beneficiary.Name</MudSelectItem>
@@ -40,18 +42,31 @@
 
     IEnumerable<BeneficiaryDto> beneficiaries = new List<BeneficiaryDto>();
 
+    private MudSelect<long>? _beneficiarySelect;
+
+    private string GetBeneficiaryName(long id)
+    {
+        if (id == 0) return "";
+        var beneficiary = beneficiaries?.FirstOrDefault(b => b.Id == id);
+        return beneficiary?.Name ?? id.ToString();
+    }
+
     protected override async Task OnInitializedAsync()
     {
+        beneficiaries = await VaultService.GetBeneficiariesAsync(AuthService.Email ?? string.Empty, null);
+
         if (AccountEditDto != null)
         {
             model.Id = AccountEditDto.Id;
             model.AccountType = AccountEditDto.AccountType;
-            model.BeneficiaryId = AccountEditDto.BeneficiaryId;
+            if (AccountEditDto.BeneficiaryIds != null && AccountEditDto.BeneficiaryIds.Count > 0)
+            {
+                model.BeneficiaryIds = new HashSet<long>(AccountEditDto.BeneficiaryIds);
+            }
             model.AccountNo = AccountEditDto.AccountNo;
             model.Name = AccountEditDto.Name;
             model.DateOpened = AccountEditDto.DateOpened;
         }
-        beneficiaries = await VaultService.GetBeneficiariesAsync(AuthService.Email ?? string.Empty, null);
     }
     private Task OnValidSubmit(EditContext context)
     {
@@ -60,39 +75,44 @@
     }
     async Task Save()
     {
+        var selected = _beneficiarySelect?.SelectedValues?
+            .Cast<long>()
+            .Where(id => id != 0)  // exclude ID 0
+            .ToList() ?? new List<long>();
+
+        if (selected.Count == 0)
+        {
+            Snackbar.Add("Please select at least one beneficiary.", Severity.Warning);
+            return;
+        }
+
         if (AccountEditDto != null)
         {
-            var accountUpdate = new AccountUpdateDto { Name = model.Name, AccountNo = model.AccountNo, AccountType = model.AccountType, BeneficiaryId = model.BeneficiaryId, DateOpened = model.DateOpened };
+            var accountUpdate = new AccountUpdateDto
+            {
+                Name = model.Name,
+                BeneficiaryIds = selected,
+                AccountType = model.AccountType,
+                AccountNo = model.AccountNo,
+                DateOpened = model.DateOpened
+            };
             await VaultService.UpdateAccountAsync(model.Id, accountUpdate);
         }
         else
         {
-            var accoundId = await CreateAccountAsync();
+            var accountDto = new AccountCreateDto
+            {
+                Name = model.Name,
+                UserName = AuthService.Email ?? string.Empty,
+                BeneficiaryIds = selected,
+                AccountType = model.AccountType,
+                AccountNo = model.AccountNo,
+                DateOpened = model.DateOpened
+            };
+            var accoundId = await VaultService.CreateAccountAsync(accountDto);
             model = accoundId > 0 ? model : new AccountModel();
             Snackbar.Add(accoundId > 0 ? "Account created successfully" : "Error occurred.");
         }
-        MudDialog?.Close(DialogResult.Ok(new AccountDto { AccountNo = model.AccountNo, AccountType = model.AccountType, BeneficiaryId = model.BeneficiaryId, DateOpened = model.DateOpened, Id = model.Id, Name = model.Name }));
-    }
-    private async Task<long> CreateAccountAsync()
-    {
-        try
-        {
-            AccountCreateDto accountDto = new AccountCreateDto();
-            accountDto.Name = model.Name;
-            accountDto.UserName = AuthService.Email ?? string.Empty;
-            accountDto.BeneficiaryId = model.BeneficiaryId;
-            accountDto.AccountType = model.AccountType;
-            accountDto.AccountNo = model.AccountNo;
-            accountDto.DateOpened = model.DateOpened;
-
-            var accountId = await VaultService.CreateAccountAsync(accountDto);
-
-             return accountId;
-        }
-        catch (Exception)
-        {
-            
-            throw;
-        }   
+        MudDialog?.Close(DialogResult.Ok(new AccountDto { AccountNo = model.AccountNo, AccountType = model.AccountType, DateOpened = model.DateOpened, Id = model.Id, Name = model.Name, BeneficiaryIds=selected}));
     }
 }

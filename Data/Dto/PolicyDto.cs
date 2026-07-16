@@ -15,8 +15,8 @@ namespace VaultUI.Data.Dto
         public string Name { get; set; }
         [JsonPropertyName("userName")]
         public string UserName { get; set; }
-        [JsonPropertyName("beneficiaryId")]
-        public long BeneficiaryId { get; set; }
+        [JsonPropertyName("beneficiaryIds")]
+        public List<long> BeneficiaryIds { get; set; } = new List<long>();
         [JsonPropertyName("insuranceType")]
         public string InsuranceType { get; set; }
         [JsonPropertyName("insuranceNo")]
