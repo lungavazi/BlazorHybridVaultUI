@@ -2,10 +2,11 @@
 @inject VaultService VaultService
 @inject AuthService AuthService
 @inject NavigationManager Navigation
+@using System.Net.Mail
+@using System.Text.RegularExpressions
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center justify-center" Style="min-height: 100vh;">
     <MudPaper Class="pa-8 ma-4" Elevation="4" Style="width: 100%;">
-
         <div class="d-flex flex-column align-center mb-6">
             <MudIcon Icon="@Icons.Material.Filled.PersonAdd"
                      Color="Color.Tertiary"
@@ -114,7 +115,6 @@
                 Sign In
             </MudLink>
         </MudText>
-
     </MudPaper>
 </MudContainer>
 
@@ -151,14 +151,34 @@
     private void TogglePasswordVisibility() => _showPassword = !_showPassword;
     private void ToggleConfirmPasswordVisibility() => _showConfirmPassword = !_showConfirmPassword;
 
+    private bool IsValidEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email)) return false;
+        try
+        {
+            var addr = new MailAddress(email);
+            return addr.Address == email;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private bool IsValidPhone(string phone)
+    {
+        if (string.IsNullOrWhiteSpace(phone)) return false;
+        // Remove non-digits and check reasonable length (7-15 digits)
+        var cleaned = Regex.Replace(phone, @"\D", "");
+        return cleaned.Length >= 7 && cleaned.Length <= 15;
+    }
+
     private async Task SignUpAsync()
     {
         _errorMessage = string.Empty;
         _successMessage = string.Empty;
 
-        // Validation
         if (string.IsNullOrWhiteSpace(_username) ||
-            // string.IsNullOrWhiteSpace(_idNumber) ||
             string.IsNullOrWhiteSpace(_name) ||
             string.IsNullOrWhiteSpace(_surname) ||
             string.IsNullOrWhiteSpace(_cellPhone) ||
@@ -166,6 +186,18 @@
             string.IsNullOrWhiteSpace(_confirmPassword))
         {
             _errorMessage = "All fields are required.";
+            return;
+        }
+
+        if (!IsValidEmail(_username))
+        {
+            _errorMessage = "Enter a valid email address.";
+            return;
+        }
+
+        if (!IsValidPhone(_cellPhone))
+        {
+            _errorMessage = "Enter a valid phone number (7-15 digits).";
             return;
         }
 

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace VaultUI.Data.FormModel
 {
@@ -18,8 +14,6 @@ namespace VaultUI.Data.FormModel
         public string InsuranceNo { get; set; }
         [Required]
         public DateTime DateOpened { get; set; }
-        [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Please select a beneficiary.")]
-        public long BeneficiaryId { get; set; }
+        public HashSet<long> BeneficiaryIds { get; set; } = new HashSet<long>();
     }
 }

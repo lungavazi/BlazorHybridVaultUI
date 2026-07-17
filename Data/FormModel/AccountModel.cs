@@ -7,8 +7,7 @@ namespace VaultUI.Data.FormModel
         [Required]
         public string Name { get; set; }
         public long Id { get; set; }
-        [Required]
-        public long BeneficiaryId { get; set; }
+        public HashSet<long> BeneficiaryIds { get; set; } = new HashSet<long>();
         [Required]
         public string AccountType { get; set; }
         [Required]

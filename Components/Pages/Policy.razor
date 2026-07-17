@@ -17,7 +17,9 @@
                                   @bind-Value="model.InsuranceNo" For="@(() => model.InsuranceNo)" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Numbers" AdornmentColor="Color.Primary" Immediate="true" />
                     <MudTextField T="DateTime" Format="yyyy-MM-dd" Label="Date Opened" InputType="InputType.Date" Value="DateTime.Now"
                                   For="@(() => model.DateOpened)" />
-                    <MudSelect T="long" Label="Select beneficiary" @bind-Value="model.BeneficiaryId" For="@(() => model.BeneficiaryId)" AdornmentIcon="@Icons.Material.Filled.People" AdornmentColor="Color.Primary" Immediate="true">
+                    <MudSelect T="long" MultiSelection="true" Label="Select beneficiary" SelectedValues="model.BeneficiaryIds" 
+                               ToStringFunc="@(new Func<long, string>(GetBeneficiaryName))"
+                               AdornmentIcon="@Icons.Material.Filled.People" AdornmentColor="Color.Primary" Immediate="true" @ref="_policyBeneficiarySelect">
                         @foreach (var beneficiary in beneficiaries)
                         {
                             <MudSelectItem Value="@beneficiary.Id">@beneficiary.Name</MudSelectItem>
@@ -42,19 +44,31 @@
 
     IEnumerable<BeneficiaryDto> beneficiaries = new List<BeneficiaryDto>();
 
+    private MudSelect<long>? _policyBeneficiarySelect;
+
+    private string GetBeneficiaryName(long id)
+    {
+        if (id == 0) return "";
+        var beneficiary = beneficiaries?.FirstOrDefault(b => b.Id == id);
+        return beneficiary?.Name ?? id.ToString();
+    }
+
     protected override async Task OnInitializedAsync()
     {
+        beneficiaries = await VaultService.GetBeneficiariesAsync(AuthService.Email ?? string.Empty, null);
+
         if (PolicyEditDto != null)
         {
             model.Id = PolicyEditDto.Id;
             model.Name = PolicyEditDto.Name;
-            model.BeneficiaryId = PolicyEditDto.BeneficiaryId;
+            if (PolicyEditDto.BeneficiaryIds != null && PolicyEditDto.BeneficiaryIds.Count > 0)
+            {
+                model.BeneficiaryIds = new HashSet<long>(PolicyEditDto.BeneficiaryIds);
+            }
             model.DateOpened = PolicyEditDto.DateOpened;
             model.InsuranceType = PolicyEditDto.InsuranceType;
             model.InsuranceNo = PolicyEditDto.InsuranceNo;
         }
-
-        beneficiaries = await VaultService.GetBeneficiariesAsync(AuthService.Email ?? string.Empty, null);
     }
     private async Task OnValidSubmit(EditContext context)
     {
@@ -62,33 +76,46 @@
     }
     private async Task Save()
     {
+        var selected = _policyBeneficiarySelect?.SelectedValues?
+            .Cast<long>()
+            .Where(id => id != 0)  // exclude ID 0
+            .ToList() ?? new List<long>();
+
+        if (selected.Count == 0)
+        {
+            Snackbar.Add("Please select at least one beneficiary.", Severity.Warning);
+            return;
+        }
+
         if (PolicyEditDto != null)
         {
-            var policyUpdate = new InsuranceUpdateDto { BeneficiaryId = model.BeneficiaryId, Name = model.Name, InsuranceType = model.InsuranceType, DateOpened = model.DateOpened, InsuranceNo = model.InsuranceNo };
+            var policyUpdate = new InsuranceUpdateDto
+            {
+                BeneficiaryIds = selected,
+                Name = model.Name,
+                InsuranceType = model.InsuranceType,
+                DateOpened = model.DateOpened,
+                InsuranceNo = model.InsuranceNo
+            };
             await VaultService.UpdateInsuranceAsync(model.Id, policyUpdate);
         }
         else
         {
-            var policyId = await CreatePolicyAsync();
-            model.Id = policyId;
-            model = policyId > 0 ? model : new PolicyModel();
-            Snackbar.Add(policyId > 0 ? "Policy created successfully" : "Error occurred.");
-        }
-        MudDialog?.Close(DialogResult.Ok(new PolicyDto { Id = model.Id, BeneficiaryId = model.BeneficiaryId, DateOpened = model.DateOpened, InsuranceNo = model.InsuranceNo, InsuranceType = model.InsuranceType, Name = model.Name }));
-    }
-
-    private async Task<long> CreatePolicyAsync()
-    {
-        try
-        {
-            var policyDto = new InsuranceCreateDto { Name = model.Name, UserName = AuthService.Email ?? string.Empty, BeneficiaryId = model.BeneficiaryId, InsuranceType = model.InsuranceType, InsuranceNo = model.InsuranceNo, DateOpened = model.DateOpened };
+            var policyDto = new InsuranceCreateDto
+            {
+                Name = model.Name,
+                UserName = AuthService.Email ?? string.Empty,
+                BeneficiaryIds = selected,
+                InsuranceType = model.InsuranceType,
+                InsuranceNo = model.InsuranceNo,
+                DateOpened = model.DateOpened
+            };
 
             var insuranceId = await VaultService.CreateInsuranceAsync(policyDto);
-            return insuranceId;
+            model.Id = insuranceId;
+            model = insuranceId > 0 ? model : new PolicyModel();
+            Snackbar.Add(insuranceId > 0 ? "Policy created successfully" : "Error occurred.");
         }
-        catch (Exception)
-        {
-            throw;
-        }
+        MudDialog?.Close(DialogResult.Ok(new PolicyDto { Id = model.Id, DateOpened = model.DateOpened, InsuranceNo = model.InsuranceNo, InsuranceType = model.InsuranceType, Name = model.Name, BeneficiaryIds = selected }));
     }
 }
