@@ -1,59 +1,271 @@
 ﻿@page "/wills"
 @using VaultUI.Data.Dto
-@inject IHttpClientFactory ClientFactory
+@inject LoadingService Loader
 @inject AuthService AuthService
+@inject VaultService VaultService
 
 <div class="dashboard-scroll-container">
-<MudContainer MaxWidth="MaxWidth.Medium">
-    <MudPaper>
-        <MudIconButton Icon="fas fa-plus" Color="Color.Tertiary" />
-            <MudText Typo="Typo.h5">Will</MudText>
-            <MudTextField @bind-Value="searchString1"
-                          Placeholder="Search Others"
-                          Adornment="Adornment.Start"
-                          AdornmentIcon="@Icons.Material.Filled.Search"
-                          IconSize="Size.Medium"
-                          FullWidth="true" />
-        <MudList T="string">
+    <MudContainer MaxWidth="MaxWidth.Large">
+        <MudPaper Class="pa-4">
+            <MudText Typo="Typo.h5" Class="mb-2">Will</MudText>
 
-            @foreach (var other in others)
-            {
-                <MudListItem Text="@other.Name" SecondaryText="@other.Description" Icon="@Icons.Material.Filled.Policy" />
-                    @* <MudHighlighter Text="@other.Name" HighlightedText="@searchString"></MudHighlighter> *@
-                    <MudMenu Icon="@Icons.Material.Filled.Settings"
-                             Color="Color.Tertiary">
-                        <MudMenuItem Label="Delete" />
-                    </MudMenu>
-            }
-        </MudList>
-    </MudPaper>
-</MudContainer>
+            <MudGrid>
+                <!-- Left: Draft area (takes half the screen) -->
+                <MudItem xs="12" sm="6">
+                    <MudPaper Class="pa-3" Elevation="0">
+                        <MudText Typo="Typo.subtitle1" Class="mb-1">Draft</MudText>
+                        <MudTextField @bind-Value="DraftText"
+                                      Placeholder="Draft your will here..."
+                                      Lines="20"
+                                      FullWidth="true"
+                                      TextArea="true" />
+
+                        <div class="mt-3">
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveWillAsync">Save Will</MudButton>
+                            <MudButton Variant="Variant.Outlined" Class="ml-2" OnClick="DistributeEqually">Distribute Equally</MudButton>
+                            <MudText Class="ml-3" Color="Color.Error">@ErrorMessage</MudText>
+                            <MudText Class="ml-3" Color="Color.Success">@SuccessMessage</MudText>
+                        </div>
+                    </MudPaper>
+                </MudItem>
+
+                <!-- Right: Beneficiaries with multi-select and percentage assignment -->
+                <MudItem xs="12" sm="6">
+                    <MudPaper Class="pa-3" Elevation="0">
+                        <MudText Typo="Typo.subtitle1" Class="mb-1">Beneficiaries</MudText>
+
+                        <MudTextField @bind-Value="beneficiarySearch"
+                                      @oninput="OnBeneficiarySearchInput"
+                                      Placeholder="Search beneficiaries..."
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Search"
+                                      IconSize="Size.Medium"
+                                      FullWidth="true" />
+
+                        <div class="mt-3">
+                            @if (Beneficiaries.Any())
+                            {
+                                <div>
+                                    @foreach (var b in Beneficiaries)
+                                    {
+                                        <div class="d-flex align-center mb-2">
+                                            <input type="checkbox"
+                                                   checked="@IsSelected(b.Id)"
+                                                   @onchange="@(e => ToggleSelection(b.Id, Convert.ToBoolean(((ChangeEventArgs)e).Value)))" />
+
+                                            <MudText Class="ml-2 mr-2" Style="flex:1">
+                                                <b>@b.Name</b><div class="mud-typography-body2">@b.Relationship</div>
+                                            </MudText>
+
+                                            <input type="number"
+                                                   min="0" max="100" step="1"
+                                                   value="@GetPercentage(b.Id)"
+                                                   @onchange="@(e => OnPercentageInputChanged(b.Id, (ChangeEventArgs)e))"
+                                                   disabled="@(!IsSelected(b.Id))"
+                                                   title="Assign percentage" style="width:80px" />
+                                            <MudText Class="ml-2">%</MudText>
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="mt-2">
+                                    <MudText Typo="Typo.body2">Total assigned: <b>@TotalPercentage%</b></MudText>
+                                    @if (SelectedIds.Any() && TotalPercentage != 100)
+                                    {
+                                        <MudText Color="Color.Error" Typo="Typo.body2">Total must be 100% before saving.</MudText>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">No beneficiaries found.</MudText>
+                            }
+                        </div>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </MudContainer>
 </div>
+
 @code {
+    private string DraftText { get; set; } = string.Empty;
+    private IEnumerable<BeneficiaryDto> Beneficiaries { get; set; } = Enumerable.Empty<BeneficiaryDto>();
+    private string beneficiarySearch = string.Empty;
+
+    // Selection and percentage state
+    private HashSet<long> SelectedIds { get; } = new();
+    private Dictionary<long, decimal> Percentages { get; } = new();
+
+    private string ErrorMessage = string.Empty;
+    private string SuccessMessage = string.Empty;
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            await base.OnInitializedAsync();
-
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"{Constants.API_URL}/others/{AuthService.Email ?? string.Empty}");
-
-            var httpClient = ClientFactory.CreateClient();
-            using var response = await httpClient.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                using var responseStream = await response.Content.ReadAsStreamAsync();
-                others = await JsonSerializer.DeserializeAsync<IEnumerable<OtherDto>>(responseStream);
-            }
+            Loader.IsLoading = true;
+            await RefreshBeneficiariesAsync();
+            await GetWillAsync();
         }
-        catch (Exception ex)
+        finally
         {
-            others = new List<OtherDto>();
-            // throw;
+            Loader.IsLoading = false;
+        }
+    }
+
+    private async Task OnBeneficiarySearchInput(ChangeEventArgs e)
+    {
+        beneficiarySearch = e.Value?.ToString() ?? string.Empty;
+        await RefreshBeneficiariesAsync();
+    }
+
+    private async Task RefreshBeneficiariesAsync()
+    {
+        var list = await VaultService.GetBeneficiariesAsync(AuthService.Email ?? string.Empty, beneficiarySearch);
+        Beneficiaries = list.OrderBy(b => b.Name);
+        StateHasChanged();
+    }
+
+    private async Task GetWillAsync()
+    {
+        var will = await VaultService.GetWillAsync(AuthService.Email ?? string.Empty);
+        if (will != null)
+        {
+            DraftText = will?.Draft;
+            if (will.Beneficiaries != null)
+            {
+                SelectedIds.Clear();
+                Percentages.Clear();
+                foreach (var b in will.Beneficiaries)
+                {
+                    SelectedIds.Add(b.BeneficiaryId);
+                    Percentages[b.BeneficiaryId] = b.Percentage;
+                }
+            }
+            
+        }
+        StateHasChanged();
+    }
+    private bool IsSelected(long id) => SelectedIds.Contains(id);
+
+    private void ToggleSelection(long id, bool selected)
+    {
+        if (selected)
+        {
+            SelectedIds.Add(id);
+            if (!Percentages.ContainsKey(id))
+                Percentages[id] = 0m;
+        }
+        else
+        {
+            SelectedIds.Remove(id);
+            Percentages.Remove(id);
+        }
+    }
+
+    private decimal GetPercentage(long id) => Percentages.TryGetValue(id, out var v) ? v : 0m;
+
+    private void OnPercentageInputChanged(long id, ChangeEventArgs e)
+    {
+        if (!SelectedIds.Contains(id))
+            return;
+
+        if (decimal.TryParse(e.Value?.ToString(), out var value))
+        {
+            if (value < 0) value = 0;
+            if (value > 100) value = 100;
+            Percentages[id] = Math.Round(value, 2);
+        }
+        else
+        {
+            Percentages[id] = 0m;
         }
 
+        StateHasChanged();
     }
-    private IEnumerable<OtherDto> others = new List<OtherDto>();
-    string searchString1 = "";
+
+    private decimal TotalPercentage => Percentages.Values.Sum();
+
+    private void DistributeEqually()
+    {
+
+        Loader.IsLoading = true;
+        if (!SelectedIds.Any())
+        {
+            ErrorMessage = "No beneficiaries selected to distribute percentages.";
+            SuccessMessage = string.Empty;
+            return;
+        }
+
+        ErrorMessage = string.Empty;
+        SuccessMessage = string.Empty;
+
+        var count = SelectedIds.Count;
+        var baseShare = Math.Floor(100m / count);
+        var remainder = 100m - (baseShare * count);
+
+        foreach (var id in SelectedIds)
+            Percentages[id] = baseShare;
+
+        // distribute remainder (1% at a time)
+        foreach (var id in SelectedIds)
+        {
+            if (remainder <= 0) break;
+            Percentages[id] += 1;
+            remainder -= 1;
+        }
+        Loader.IsLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task SaveWillAsync()
+    {
+        try
+        {
+            Loader.IsLoading = true;
+
+            ErrorMessage = string.Empty;
+            SuccessMessage = string.Empty;
+
+            if (!SelectedIds.Any())
+            {
+                ErrorMessage = "Please select at least one beneficiary.";
+                Loader.IsLoading = false;
+                return;
+            }
+
+            if (TotalPercentage != 100m)
+            {
+                ErrorMessage = "Total percentage must equal 100% before saving.";
+                Loader.IsLoading = false;
+                return;
+            }
+
+            var willPayload = new WillCreateRequestDto
+            {
+                Draft = DraftText,
+                Beneficiaries = SelectedIds.Select(id => new WillBeneficiaries
+                {
+                    Beneficiaryid = id,
+                    Percentage = Percentages.TryGetValue(id, out var p) ? p : 0m
+                }).ToList(),
+
+                Username = AuthService.Email
+            };
+
+            var willId = VaultService.CreateUpdateWill(willPayload);
+
+            Loader.IsLoading = false;
+        }
+        catch (Exception)
+        {
+            Loader.IsLoading = false;
+            throw;
+        }
+    }
+    public void Dispose()
+    {
+        Loader.OnChange -= StateHasChanged;
+    }
 }

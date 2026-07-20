@@ -20,7 +20,7 @@
                     <MudTextField Label="Physical Address" Class="mt-3" Lines="5" MaxLength="100" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Home" AdornmentColor="Color.Primary" Immediate="true"
                                   @bind-Value="model.Address" For="@(() => model.Address)" />
                     <MudTextField T="DateTime" Format="yyyy-MM-dd" Label="Date Of Birth" InputType="InputType.Date" AdornmentIcon="@Icons.Material.Filled.DateRange" AdornmentColor="Color.Primary"
-                                  @bind-Value="model.DateOfBirth" For="@(() => model.DateOfBirth)" />
+                                  For="@(() => model.DateOfBirth)" Value="DateTime.Now" />
                 </MudCardContent>
                 <MudCardActions>
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Save</MudButton>

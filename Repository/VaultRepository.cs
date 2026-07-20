@@ -25,7 +25,6 @@ namespace VaultUI.Repository
         {
             var result = await _apiClient.GetAsync<IEnumerable<BeneficiaryDto>>($"beneficiaries/{userName}?beneficiaryName={beneficiaryName}");
             return result ?? Enumerable.Empty<BeneficiaryDto>();
-            
         }
         public async Task<DashboardDto> GetDashboardInfoAsync(string userName)
         {
@@ -42,7 +41,11 @@ namespace VaultUI.Repository
             var result = await _apiClient.GetAsync<UserInfoDto>($"user/{userName}");
             return result ?? new UserInfoDto();
         }
-
+        public async Task<WillResponseDto> GetWillAsync(string userName)
+        {
+            var result = await _apiClient.GetAsync<WillResponseDto>($"will/{userName}");
+            return result ?? new WillResponseDto();
+        }
         public async Task<long> PostPolicyAsync(InsuranceCreateDto insurance)
         {
             var result = await _apiClient.PostAsync<InsuranceCreateDto, long>( "insurance", insurance);
@@ -93,6 +96,10 @@ namespace VaultUI.Repository
         public async Task<SignUpResponseDto?> SignUpAsync(SignUpRequestDto signUpRequest)
         {
             return await _apiClient.PostAsync<SignUpRequestDto, SignUpResponseDto>("auth/register", signUpRequest);
+        }
+        public async Task<long> CreateUpdateWill(WillCreateRequestDto willCreateDto)
+        {
+            return await _apiClient.PostAsync<WillCreateRequestDto, long>("will", willCreateDto);
         }
     }
 }

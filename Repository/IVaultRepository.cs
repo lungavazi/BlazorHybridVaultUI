@@ -20,5 +20,7 @@ namespace VaultUI.Repository
         Task DeleteAccountAsync(long id);
         Task DeleteInsuranceAsync(long id);
         Task<SignUpResponseDto?> SignUpAsync(SignUpRequestDto signUpRequest);
+        Task<long> CreateUpdateWill(WillCreateRequestDto willCreateDto);
+        Task<WillResponseDto> GetWillAsync(string userName);
     }
 }

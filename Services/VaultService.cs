@@ -37,6 +37,10 @@ namespace VaultUI.Services
         {
             return await _vaultRepository.GetDashboardInfoAsync(username);
         }
+        public async Task<WillResponseDto?> GetWillAsync(string username)
+        {
+            return await _vaultRepository.GetWillAsync(username);
+        }
         public async Task<long> CreateBeneficiaryAsync(BeneficiaryCreateDto beneficiary)
         {
             return await _vaultRepository.PostBeneficiaryAsync(beneficiary);
@@ -76,6 +80,10 @@ namespace VaultUI.Services
         public async Task<SignUpResponseDto?> SignUpAsync(SignUpRequestDto signUpRequest)
         {
             return await _vaultRepository.SignUpAsync(signUpRequest);
+        }
+        public async Task<long> CreateUpdateWill(WillCreateRequestDto willCreateRequest)
+        {
+            return await _vaultRepository.CreateUpdateWill(willCreateRequest);
         }
     }
 }
