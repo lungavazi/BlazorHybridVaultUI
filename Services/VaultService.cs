@@ -85,5 +85,14 @@ namespace VaultUI.Services
         {
             return await _vaultRepository.CreateUpdateWill(willCreateRequest);
         }
+        public async Task<long> SubscribeAsync(SubscriptionCreateDto subscription)
+        {
+            return await _vaultRepository.SubscribeAsync(subscription);
+        }
+
+        public async Task UnsubscribeAsync(string userName)
+        {
+            await _vaultRepository.UnsubscribeAsync(userName);
+        }
     }
 }

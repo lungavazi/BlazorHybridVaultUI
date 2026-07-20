@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using VaultUI.Helpers;
 
 namespace VaultUI.Data.Dto
 {
@@ -21,6 +22,12 @@ namespace VaultUI.Data.Dto
         public string Surname { get; set; }
         [JsonPropertyName("cellNo")]
         public string telephone { get; set; }
+        [JsonPropertyName("subscribedPeriod")]
+        public CycleType? SubscribedPeriod { get; set; }
+        [JsonPropertyName("subscribedAt")]
+        public DateTime? SubscribedAt { get; set; }
+        [JsonPropertyName("isSubscribed")]
+        public Boolean? IsSubscribed { get; set; }
 
     }
 }

@@ -61,6 +61,9 @@
 
                 if (user != null)
                     InitializeUserFields(user);
+                    AuthService.Subscribe(user);
+
+
         }
         catch (Exception ex)
         {

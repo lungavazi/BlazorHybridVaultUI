@@ -11,6 +11,7 @@ namespace VaultUI.Repository
         {
             _apiClient = apiClient;
         }
+
         public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto loginRequest)
         {
             return await _apiClient.PostAsync<LoginRequestDto, LoginResponseDto>("auth/login", loginRequest);
@@ -100,6 +101,18 @@ namespace VaultUI.Repository
         public async Task<long> CreateUpdateWill(WillCreateRequestDto willCreateDto)
         {
             return await _apiClient.PostAsync<WillCreateRequestDto, long>("will", willCreateDto);
+        }
+
+        // Subscription endpoints
+        public async Task<long> SubscribeAsync(SubscriptionCreateDto subscription)
+        {
+            var result = await _apiClient.PostAsync<SubscriptionCreateDto, long>("subscribe", subscription);
+            return result;
+        }
+
+        public async Task UnsubscribeAsync(string userName)
+        {
+            await _apiClient.DeleteAync<long>($"unsubscribe/{userName}");
         }
     }
 }

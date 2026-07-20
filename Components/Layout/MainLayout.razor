@@ -1,4 +1,3 @@
-
 @inherits LayoutComponentBase
 @inject LoadingService Loader
 @inject AuthService AuthService
@@ -26,7 +25,16 @@ else
         <MudAppBar Color="Color.Tertiary" Fixed="true">
             <MudIconButton Icon="@Icons.Material.Filled.ManageAccounts" OnClick="DrawerToggle" Color="Color.Inherit" />
             <MudSpacer />
-            <MudChip T="string" Icon="@Icons.Material.Filled.Subscriptions" Color="Color.Warning">Monitoring not activated</MudChip>
+            @if (AuthService.IsSubscribed)
+            {
+                <MudChip T="string" Icon="@Icons.Material.Filled.Subscriptions" Color="Color.Success">
+                    Subscribed: @AuthService.SubscribedCycle @if (AuthService.SubscribedAt.HasValue) { <span class="ml-2" style="font-size:0.8rem">since @AuthService.SubscribedAt.Value.ToLocalTime().ToShortDateString()</span> }
+                </MudChip>
+            }
+            else
+            {
+                <MudChip T="string" Icon="@Icons.Material.Filled.Subscriptions" Color="Color.Warning">Monitoring not activated</MudChip>
+            }
             <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" OnClick="Logout" Title="Sign out" />
         </MudAppBar>
         <MudDrawer @bind-Open="@_drawerOpen" Variant="DrawerVariant.Temporary">
@@ -70,6 +78,7 @@ else
     {
         Loader.OnChange += StateHasChanged;
         AuthService.OnAuthStateChanged += StateHasChanged;
+        AuthService.OnSubscriptionChanged += StateHasChanged;
 
         if (!AuthService.IsAuthenticated)
             Navigation.NavigateTo("/login", replace: true);
@@ -79,5 +88,6 @@ else
     {
         Loader.OnChange -= StateHasChanged;
         AuthService.OnAuthStateChanged -= StateHasChanged;
+        AuthService.OnSubscriptionChanged -= StateHasChanged;
     }
 }

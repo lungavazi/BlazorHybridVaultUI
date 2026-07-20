@@ -1,98 +1,212 @@
 ﻿@page "/subscription"
 @using System.Text
+@inject AuthService AuthService
+@inject MudBlazor.ISnackbar Snackbar
+@inject VaultService VaultService
 
 <div class="dashboard-scroll-container">
 <MudContainer MaxWidth="MaxWidth.Medium">
-    <MudPaper>
-        <MudPaper Class="pa-4">
-            <MudStack Spacing="2">
-                <MudButton Color="Color.Error" OnClick="OnExpandCollapseClick"  StartIcon="@Icons.Material.Filled.ExpandMore">Subscription</MudButton>
-                <MudDivider />
-                <MudCollapse Expanded="_expanded">
-                    <MudGrid>
-                        <MudItem xs="12" md="1">
-                            <MudRadioGroup T="CycleType" ValueChanged="OnRadionChaned" Value="Cycle">
-                                <MudRadio Color="Color.Primary" Value="@(CycleType.Trial)">Trial</MudRadio>
-                                <MudRadio Color="Color.Primary" Value="@(CycleType.Weekly)">Weekly</MudRadio>
-                                <MudRadio Color="Color.Primary" Value="@(CycleType.Monthly)">Monthly</MudRadio>
-                                <MudRadio Color="Color.Primary" Value="@(CycleType.Quarterly)">Quarterly</MudRadio>
-                                <MudRadio Color="Color.Primary" Value="@(CycleType.Yearly)">Yearly</MudRadio>
-                            </MudRadioGroup>
-                        </MudItem>
-                        <MudItem xs="12" md="9" Class="d-flex justify-center align-center my-auto">
-                            <MudCard>
-                                <MudCardHeader>
-                                    <CardHeaderContent>
-                                        <MudText Typo="Typo.h5">Subscription Info</MudText>
-                                    </CardHeaderContent>
-                                </MudCardHeader>
-                                <MudCardContent>
-                                    <MudText Typo="Typo.body2">@subscriptionDetail</MudText>
-                                </MudCardContent>
-                            </MudCard>
-                        </MudItem>
-                        <MudItem xs="12" md="2" Style="width:100%"></MudItem>
-                    </MudGrid>
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Subscriptions" Color="Color.Error">Subscribe</MudButton>
-                </MudCollapse>
-            </MudStack>
-        </MudPaper>
-        @* <MudText Typo="Typo.h5">History</MudText> *@
-       @*  <MudTextField
-                      Placeholder="Search History"
-                      Adornment="Adornment.Start"
-                      AdornmentIcon="@Icons.Material.Filled.Search"
-                      IconSize="Size.Medium"
-                      FullWidth="true" />
-        <MudList T="string"> *@
+    <MudPaper Class="pa-4">
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.h5">Subscriptions</MudText>
+            <MudDivider />
 
-            @*  @foreach (var policy in PoliciesDto)
-                    {
-                        <MudListItem Text="@policy.Name" SecondaryText="@policy.InsuranceType" Icon="@Icons.Material.Filled.Policy" OnClick="@(() => EditPolicy(policy))">
-                            <MudHighlighter Text="@policy.Name" HighlightedText="@searchString"></MudHighlighter>
-                        </MudListItem>
-                    } *@
-        @* </MudList> *@
+            <MudGrid>
+                <MudItem xs="12" md="4">
+                    <MudPaper Class="pa-3">
+                        <MudText Typo="Typo.subtitle1">Choose a plan</MudText>
+                        <MudRadioGroup T="CycleType" @bind-SelectedValue="Cycle" Row="false" ValueChanged="OnCycleChanged">
+                            <MudRadio Color="Color.Primary" Value="CycleType.Trial">Trial (Free)</MudRadio>
+                            <MudRadio Color="Color.Primary" Value="CycleType.Weekly">Weekly</MudRadio>
+                            <MudRadio Color="Color.Primary" Value="CycleType.Monthly">Monthly</MudRadio>
+                            <MudRadio Color="Color.Primary" Value="CycleType.Quarterly">Quarterly</MudRadio>
+                            <MudRadio Color="Color.Primary" Value="CycleType.Yearly">Yearly</MudRadio>
+                        </MudRadioGroup>
+                        <MudDivider Class="my-2" />
+                        <MudText Typo="Typo.body2">Price: <b>@FormatPrice(Cycle)</b></MudText>
+                        <MudText Typo="Typo.caption" Class="d-block mt-1">@subscriptionDetail</MudText>
+                        <MudSpace />
+                        <MudStack Direction="Row" Spacing="1" Class="mt-3">
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Subscriptions" Color="Color.Primary" OnClick="SubscribeAsync" Disabled="@(isProcessing || Cycle == CycleType.Trial)">
+                                @(isProcessing ? "Processing..." : (AuthService.IsSubscribed && AuthService.SubscribedCycle == Cycle ? "Update" : "Subscribe"))
+                            </MudButton>
+                            @if (AuthService.IsSubscribed)
+                            {
+                                <MudButton Variant="Variant.Text" Color="Color.Error" StartIcon="@Icons.Material.Filled.Cancel" OnClick="UnsubscribeAsync" Disabled="isProcessing">Unsubscribe</MudButton>
+                            }
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+
+                <MudItem xs="12" md="8">
+                    <MudCard>
+                        <MudCardHeader>
+                            <MudText Typo="Typo.h6">Subscription Info</MudText>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            @if (AuthService.IsSubscribed)
+                            {
+                                <MudText Typo="Typo.body1">You are subscribed to <b>@AuthService.SubscribedCycle</b> (since @AuthService.SubscribedAt?.ToLocalTime().ToString("g")).</MudText>
+                                <MudText Typo="Typo.body2">Amount: <b>@FormatPrice(AuthService.SubscribedCycle ?? CycleType.Trial)</b></MudText>
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.body2">No active subscription. Select a plan on the left and click Subscribe.</MudText>
+                            }
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </MudStack>
     </MudPaper>
 </MudContainer>
 </div>
+
 @code {
-    StringBuilder subscriptionDetail = new StringBuilder("No Subscription History");
-    private void OnRadionChaned(CycleType newValue)
+    StringBuilder subscriptionDetail = new StringBuilder("Choose a plan to subscribe.");
+    public CycleType Cycle { get; set; } = CycleType.Trial;
+    bool isProcessing = false;
+
+    protected override void OnInitialized()
     {
-        Cycle = newValue;
+        UpdateSubscriptionDetail();
+        AuthService.OnSubscriptionChanged += StateHasChanged;
+    }
+
+    void OnCycleChanged(CycleType newCycle)
+    {
+        Cycle = newCycle;
+        UpdateSubscriptionDetail();
+    }
+
+    void UpdateSubscriptionDetail()
+    {
         subscriptionDetail.Clear();
         switch (Cycle)
         {
             case CycleType.Trial:
-                subscriptionDetail.Append("No Subscription");
+                subscriptionDetail.Append("Trial: limited features.");
                 break;
             case CycleType.Weekly:
-                subscriptionDetail.AppendLine("Weekly Subscription");
+                subscriptionDetail.AppendLine("Weekly subscription");
                 subscriptionDetail.AppendLine("15.00");
                 break;
             case CycleType.Monthly:
-                subscriptionDetail.AppendLine("Monthly Subscription");
+                subscriptionDetail.AppendLine("Monthly subscription");
                 subscriptionDetail.AppendLine("29.99");
                 break;
             case CycleType.Quarterly:
-                subscriptionDetail.AppendLine("Quarterly Subscription");
+                subscriptionDetail.AppendLine("Quarterly subscription");
                 subscriptionDetail.AppendLine("49.99");
                 break;
             case CycleType.Yearly:
-                subscriptionDetail.AppendLine("Yearly Subscription");
+                subscriptionDetail.AppendLine("Yearly subscription");
                 subscriptionDetail.AppendLine("99.99");
-                break;
-            default:
-                subscriptionDetail.Append(string.Empty);
                 break;
         }
     }
-    public CycleType Cycle { get; set; } 
-    bool _expanded = false;
 
-    private void OnExpandCollapseClick()
+    private string FormatPrice(CycleType? cycle)
     {
-        _expanded = !_expanded;
+        if (!cycle.HasValue || cycle == CycleType.Trial)
+            return "R0.00";
+
+        return cycle.Value switch
+        {
+            CycleType.Weekly => "R15.00",
+            CycleType.Monthly => "R29.99",
+            CycleType.Quarterly => "R49.99",
+            CycleType.Yearly => "R99.99",
+            _ => "$0.00"
+        };
+    }
+
+    private async Task SubscribeAsync()
+    {
+        if (Cycle == CycleType.Trial)
+        {
+            Snackbar.Add("Please choose a paid plan to subscribe.", MudBlazor.Severity.Warning);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(AuthService.Email))
+        {
+            Snackbar.Add("No user context available.", MudBlazor.Severity.Error);
+            return;
+        }
+
+        isProcessing = true;
+        StateHasChanged();
+
+        var dto = new SubscriptionCreateDto
+        {
+            UserName = AuthService.Email!,
+            Cycle = Cycle,
+            Amount = Cycle switch
+            {
+                CycleType.Weekly => 15.00m,
+                CycleType.Monthly => 29.99m,
+                CycleType.Quarterly => 49.99m,
+                CycleType.Yearly => 99.99m,
+                _ => 0m
+            },
+            SubscribedAt = DateTime.UtcNow
+        };
+
+        try
+        {
+            var id = await VaultService.SubscribeAsync(dto);
+            if (id > 0)
+            {
+                // AkuthService.Subscribe(Cycle);
+                Snackbar.Add($"Subscribed to {Cycle} ({FormatPrice(Cycle)}).", MudBlazor.Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Subscription failed. Please try again.", MudBlazor.Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error while subscribing: {ex.Message}", MudBlazor.Severity.Error);
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task UnsubscribeAsync()
+    {
+        if (string.IsNullOrWhiteSpace(AuthService.Email))
+        {
+            Snackbar.Add("No user context available.", MudBlazor.Severity.Error);
+            return;
+        }
+
+        isProcessing = true;
+        StateHasChanged();
+
+        try
+        {
+            await VaultService.UnsubscribeAsync(AuthService.Email!);
+            AuthService.Unsubscribe();
+            Snackbar.Add("Unsubscribed.", MudBlazor.Severity.Info);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error while unsubscribing: {ex.Message}", MudBlazor.Severity.Error);
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        AuthService.OnSubscriptionChanged -= StateHasChanged;
     }
 }
