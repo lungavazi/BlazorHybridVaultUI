@@ -39,7 +39,16 @@
 </MudPaper>
 </MudContainer>
 </div>
+<MudMessageBox @ref="_mudMessageBox" Title="Confirm Delete" CancelText="Cancel">
+    <MessageContent>
+        Are you sure you want to delete this policy?
+    </MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever">Delete!</MudButton>
+    </YesButton>
+</MudMessageBox>
 @code {
+    private MudMessageBox _mudMessageBox;
     string searchString;
     private async Task HandleKeyDownAsync(KeyboardEventArgs e)
     {
@@ -70,8 +79,12 @@
     }
     public async Task DeleteInsuranceAsync(long id)
     {
-        await VaultService.DeleteInsuranceAsync(id);
-        PoliciesDto.Remove(id);
+        bool? result = await _mudMessageBox.ShowAsync();
+        if( result is not null && result == true )
+        {
+            await VaultService.DeleteInsuranceAsync(id);
+            PoliciesDto.Remove(id);
+        }
     }
     public async Task AddPolicyAsync()
     {
@@ -115,4 +128,4 @@
         var policies = await VaultService.GetPoliciesAsync(AuthService.Email ?? string.Empty, searchString);
         PoliciesDto = policies.ToDictionary(p => p.Id);
     }
-}
+    }

@@ -37,9 +37,18 @@
         }
 </MudList>
 </MudPaper>
-</MudContainer>
+    </MudContainer>
+    <MudMessageBox @ref="_mudMessageBox" Title="Confirm Delete" CancelText="Cancel">
+        <MessageContent>
+            Are you sure you want to delete this beneficiary?
+        </MessageContent>
+        <YesButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever">Delete!</MudButton>
+        </YesButton>
+    </MudMessageBox>
 </div>
-    @code {
+@code {
+    private MudMessageBox _mudMessageBox;
 
 
     public async Task EditBeneficiary(BeneficiaryDto policy)
@@ -63,8 +72,12 @@
 
     public async Task DeleteBeneficiaryAsync(long id)
     {
-        await VaultService.DeleteBeneficiaryAsync(id);
-        BeneficiariesDto.Remove(id);
+        bool? result = await _mudMessageBox.ShowAsync();
+        if (result is not null && result == true)
+        {
+            await VaultService.DeleteBeneficiaryAsync(id);
+            BeneficiariesDto.Remove(id);
+        }
     }
     string searchString = "";
     public Dictionary<long, BeneficiaryDto> BeneficiariesDto = new();
