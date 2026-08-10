@@ -8,15 +8,17 @@ namespace VaultUI.Data.Dto
 {
     public class WillCreateRequestDto
     {
-        public string Username { get; set; } = string.Empty;
-        public string Draft { get; set; } = string.Empty;
-        public List<WillBeneficiaries> Beneficiaries { get; set; }
+        public long? Id { get; set; }
+        public string? Username { get; set; }
+        public string? InstitutionName { get; set; }
+        public string? InstitutionAddress { get; set; }
+        public string? ContactName { get; set; }
+        public string? ContactRole { get; set; }
+        public string? ContactPhone { get; set; }
+        public string? ContactEmail { get; set; }
+        public string? Notes { get; set; }
     }
-    
 
-    public class WillBeneficiaries
-    {
-        public long Beneficiaryid { get; set; }
-        public decimal Percentage { get; set; }
-    }
+
+  
 }

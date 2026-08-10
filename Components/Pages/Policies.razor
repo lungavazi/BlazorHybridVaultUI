@@ -105,7 +105,6 @@
     {
         try
         {
-            // await base.OnInitializedAsync();
             Loader.IsLoading = true;
             await RefreshPolicies();
 
@@ -114,7 +113,6 @@
         catch (Exception ex)
         {
             Loader.IsLoading = false;
-            // throw;
         }
     }
 

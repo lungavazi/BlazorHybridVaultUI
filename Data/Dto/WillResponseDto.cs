@@ -6,18 +6,16 @@ using System.Threading.Tasks;
 
 namespace VaultUI.Data.Dto
 {
-    public record WillResponseDto
+    public class WillResponseDto
     {
         public long Id { get; set; }
-        //public long UserId { get; set; }
-        public string Draft { get; set; } = string.Empty;
-        //public DateTime DateCreated { get; set; }
-        //public DateTime DateModified { get; set; }
-        public IEnumerable<WillBeneficiaryResponseDto> Beneficiaries { get; set; } = Enumerable.Empty<WillBeneficiaryResponseDto>();
-    }
-        public record WillBeneficiaryResponseDto
-    {
-        public long BeneficiaryId { get; set; }
-        public decimal Percentage { get; set; }
+        public string? Username { get; set; }
+        public string? InstitutionName { get; set; }
+        public string? InstitutionAddress { get; set; }
+        public string? ContactName { get; set; }
+        public string? ContactRole { get; set; }
+        public string? ContactPhone { get; set; }
+        public string? ContactEmail { get; set; }
+        public string? Notes { get; set; }
     }
 }

@@ -48,13 +48,14 @@
         {
             var beneficiaryUpdate = new BeneficiaryUpdateDto { Name = model.Name, Relationship = model.Relationship, CellNo = model.CellPhone, Email = model.Email, Address = model.Address, DateOfBirth = model.Address };
             await VaultService.UpdateBeneficiaryAsync(model.Id, beneficiaryUpdate);
+            Snackbar.Add(model.Id > 0 ? "Beneficiary saved successfully" : "Error occurred.", model.Id > 0 ? Severity.Success : Severity.Error);
         }
         else
         {
             var beneficiaryID = await CreateBeneficiaryAsync();
             model = beneficiaryID > 0 ? model : new BeneficiaryModel();
             model.Id = beneficiaryID;
-            Snackbar.Add(beneficiaryID > 0 ? "Beneficiary created successfully" : "Error occurred.");
+            Snackbar.Add(beneficiaryID > 0 ? "Beneficiary created successfully" : "Error occurred.", beneficiaryID > 0 ? Severity.Success : Severity.Error);
         }
         MudDialog?.Close(DialogResult.Ok(new BeneficiaryDto { Address = model.Address, DateOfBirth = model.DateOfBirth.ToShortDateString(), CellNo = model.CellPhone, Email = model.Email, Id = model.Id, Name = model.Name, Relationship = model.Relationship, SecondaryEmail = model.Email, SecondaryTelephone = model.CellPhone }));
     }
@@ -67,7 +68,6 @@
             model.UserId = BeneficiaryEditDto.UserId;
             model.Relationship = BeneficiaryEditDto.Relationship;
             model.CellPhone = BeneficiaryEditDto.CellNo;
-            // model.DateOfBirth = BeneficiaryEditDto.DateOfBirth;
             model.Email = BeneficiaryEditDto.Email;
             model.Id = BeneficiaryEditDto.Id;
         }

@@ -1,86 +1,86 @@
 ﻿@page "/wills"
-@using VaultUI.Data.Dto
 @inject LoadingService Loader
 @inject AuthService AuthService
 @inject VaultService VaultService
+@inject ISnackbar Snackbar
 
 <div class="dashboard-scroll-container">
-    <MudContainer MaxWidth="MaxWidth.Large">
+    <MudContainer MaxWidth="MaxWidth.Medium">
         <MudPaper Class="pa-4">
-            <MudText Typo="Typo.h5" Class="mb-2">Will</MudText>
+            <MudText Typo="Typo.h5" Class="mb-2">Will — Institution & Contact</MudText>
 
-            <MudGrid>
-                <!-- Left: Draft area (takes half the screen) -->
-                <MudItem xs="12" sm="6">
+            <MudGrid Spacing="3">
+                <MudItem xs="12" md="6">
                     <MudPaper Class="pa-3" Elevation="0">
-                        <MudText Typo="Typo.subtitle1" Class="mb-1">Draft</MudText>
-                        <MudTextField @bind-Value="DraftText"
-                                      Placeholder="Draft your will here..."
-                                      Lines="20"
-                                      FullWidth="true"
-                                      TextArea="true" />
+                        <MudText Typo="Typo.subtitle1" Class="mb-2">Institution</MudText>
 
-                        <div class="mt-3">
-                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveWillAsync">Save Will</MudButton>
-                            <MudButton Variant="Variant.Outlined" Class="ml-2" OnClick="DistributeEqually">Distribute Equally</MudButton>
-                            <MudText Class="ml-3" Color="Color.Error">@ErrorMessage</MudText>
-                            <MudText Class="ml-3" Color="Color.Success">@SuccessMessage</MudText>
+                        <MudTextField @bind-Value="InstitutionName" Label="Institution name" FullWidth="true" />
+                        <MudTextField @bind-Value="InstitutionAddress" Label="Institution address" Lines="3" TextArea="true" FullWidth="true" Class="mt-2" />
+
+                        <MudDivider Class="my-3" />
+
+                        <MudText Typo="Typo.subtitle1" Class="mb-2">Contact person</MudText>
+
+                        <MudTextField @bind-Value="ContactName" Label="Full name" FullWidth="true" />
+                        <MudTextField @bind-Value="ContactRole" Label="Role / Relationship" FullWidth="true" Class="mt-2" />
+                        <MudTextField @bind-Value="ContactPhone" Label="Phone" Adornment="Adornment.Start" AdornmentText="+"
+                                      FullWidth="true" Class="mt-2" />
+                        <MudTextField @bind-Value="ContactEmail" Label="Email" FullWidth="true" Class="mt-2" />
+
+                        <MudTextField @bind-Value="Notes" Label="Notes" Lines="6" TextArea="true" FullWidth="true" Class="mt-3" />
+
+                        <div class="mt-3 d-flex">
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveWillAsync" Disabled="isProcessing">
+                                @(isProcessing ? "Saving..." : "Save")
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined" Class="ml-2" OnClick="ClearForm" Disabled="isProcessing">Clear</MudButton>
                         </div>
+
+                        @if (!string.IsNullOrEmpty(ErrorMessage))
+                        {
+                            <MudText Color="Color.Error" Class="mt-2">@ErrorMessage</MudText>
+                        }
+                        @if (!string.IsNullOrEmpty(SuccessMessage))
+                        {
+                            <MudText Color="Color.Success" Class="mt-2">@SuccessMessage</MudText>
+                        }
                     </MudPaper>
                 </MudItem>
 
-                <!-- Right: Beneficiaries with multi-select and percentage assignment -->
-                <MudItem xs="12" sm="6">
+                <MudItem xs="12" md="6">
                     <MudPaper Class="pa-3" Elevation="0">
-                        <MudText Typo="Typo.subtitle1" Class="mb-1">Beneficiaries</MudText>
+                        <MudText Typo="Typo.subtitle1" Class="mb-2">Saved will preview</MudText>
 
-                        <MudTextField @bind-Value="beneficiarySearch"
-                                      @oninput="OnBeneficiarySearchInput"
-                                      Placeholder="Search beneficiaries..."
-                                      Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search"
-                                      IconSize="Size.Medium"
-                                      FullWidth="true" />
-
-                        <div class="mt-3">
-                            @if (Beneficiaries.Any())
-                            {
-                                <div>
-                                    @foreach (var b in Beneficiaries)
-                                    {
-                                        <div class="d-flex align-center mb-2">
-                                            <input type="checkbox"
-                                                   checked="@IsSelected(b.Id)"
-                                                   @onchange="@(e => ToggleSelection(b.Id, Convert.ToBoolean(((ChangeEventArgs)e).Value)))" />
-
-                                            <MudText Class="ml-2 mr-2" Style="flex:1">
-                                                <b>@b.Name</b><div class="mud-typography-body2">@b.Relationship</div>
-                                            </MudText>
-
-                                            <input type="number"
-                                                   min="0" max="100" step="1"
-                                                   value="@GetPercentage(b.Id)"
-                                                   @onchange="@(e => OnPercentageInputChanged(b.Id, (ChangeEventArgs)e))"
-                                                   disabled="@(!IsSelected(b.Id))"
-                                                   title="Assign percentage" style="width:80px" />
-                                            <MudText Class="ml-2">%</MudText>
-                                        </div>
-                                    }
-                                </div>
-
-                                <div class="mt-2">
-                                    <MudText Typo="Typo.body2">Total assigned: <b>@TotalPercentage%</b></MudText>
-                                    @if (SelectedIds.Any() && TotalPercentage != 100)
-                                    {
-                                        <MudText Color="Color.Error" Typo="Typo.body2">Total must be 100% before saving.</MudText>
-                                    }
-                                </div>
-                            }
-                            else
-                            {
-                                <MudText Typo="Typo.body2" Color="Color.Secondary">No beneficiaries found.</MudText>
-                            }
-                        </div>
+                        @if (HasSavedWill)
+                        {
+                            <MudList T="string" Dense="true">
+                                <MudListItem>
+                                    <MudText><b>Institution:</b> @InstitutionName</MudText>
+                                </MudListItem>
+                                <MudListItem>
+                                    <MudText><b>Address:</b> @InstitutionAddress</MudText>
+                                </MudListItem>
+                                <MudListItem>
+                                    <MudText><b>Contact:</b> @ContactName (@ContactRole)</MudText>
+                                </MudListItem>
+                                <MudListItem>
+                                    <MudText><b>Phone:</b> @ContactPhone</MudText>
+                                </MudListItem>
+                                <MudListItem>
+                                    <MudText><b>Email:</b> @ContactEmail</MudText>
+                                </MudListItem>
+                                <MudListItem>
+                                    <MudText><b>Notes:</b></MudText>
+                                </MudListItem>
+                                <MudListItem>
+                                    <MudText Typo="Typo.body2">@Notes</MudText>
+                                </MudListItem>
+                            </MudList>
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">No saved will details yet.</MudText>
+                        }
                     </MudPaper>
                 </MudItem>
             </MudGrid>
@@ -89,183 +89,116 @@
 </div>
 
 @code {
-    private string DraftText { get; set; } = string.Empty;
-    private IEnumerable<BeneficiaryDto> Beneficiaries { get; set; } = Enumerable.Empty<BeneficiaryDto>();
-    private string beneficiarySearch = string.Empty;
+    bool isProcessing = false;
+    bool HasSavedWill = false;
 
-    // Selection and percentage state
-    private HashSet<long> SelectedIds { get; } = new();
-    private Dictionary<long, decimal> Percentages { get; } = new();
+    string InstitutionName { get; set; } = string.Empty;
+    string InstitutionAddress { get; set; } = string.Empty;
 
-    private string ErrorMessage = string.Empty;
-    private string SuccessMessage = string.Empty;
+    string ContactName { get; set; } = string.Empty;
+    string ContactRole { get; set; } = string.Empty;
+    string ContactPhone { get; set; } = string.Empty;
+    string ContactEmail { get; set; } = string.Empty;
+    long WillId { get; set; } = 0;
+
+    string Notes { get; set; } = string.Empty;
+
+    string ErrorMessage { get; set; } = string.Empty;
+    string SuccessMessage { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
+    {
+        Loader.OnChange += StateHasChanged;
+        await LoadSavedWillAsync();
+    }
+
+    async Task LoadSavedWillAsync()
     {
         try
         {
             Loader.IsLoading = true;
-            await RefreshBeneficiariesAsync();
-            await GetWillAsync();
+            var will = await VaultService.GetWillAsync(AuthService.Email ?? string.Empty);
+            if (will != null)
+            {
+                WillId = will.Id;
+                InstitutionName = will.InstitutionName ?? string.Empty;
+                InstitutionAddress = will.InstitutionAddress ?? string.Empty;
+
+                ContactName = will.ContactName ?? string.Empty;
+                ContactRole = will.ContactRole ?? string.Empty;
+                ContactPhone = will.ContactPhone ?? string.Empty;
+                ContactEmail = will.ContactEmail ?? string.Empty;
+
+                Notes = will.Notes ?? string.Empty;
+                HasSavedWill = true;
+            }
         }
         finally
         {
             Loader.IsLoading = false;
+            StateHasChanged();
         }
     }
 
-    private async Task OnBeneficiarySearchInput(ChangeEventArgs e)
+    void ClearForm()
     {
-        beneficiarySearch = e.Value?.ToString() ?? string.Empty;
-        await RefreshBeneficiariesAsync();
+        InstitutionName = string.Empty;
+        InstitutionAddress = string.Empty;
+        ContactName = string.Empty;
+        ContactRole = string.Empty;
+        ContactPhone = string.Empty;
+        ContactEmail = string.Empty;
+        Notes = string.Empty;
+        ErrorMessage = SuccessMessage = string.Empty;
+        HasSavedWill = false;
     }
 
-    private async Task RefreshBeneficiariesAsync()
+    async Task SaveWillAsync()
     {
-        var list = await VaultService.GetBeneficiariesAsync(AuthService.Email ?? string.Empty, beneficiarySearch);
-        Beneficiaries = list.OrderBy(b => b.Name);
-        StateHasChanged();
-    }
+        ErrorMessage = SuccessMessage = string.Empty;
 
-    private async Task GetWillAsync()
-    {
-        var will = await VaultService.GetWillAsync(AuthService.Email ?? string.Empty);
-        if (will != null)
+        if (string.IsNullOrWhiteSpace(AuthService.Email))
         {
-            DraftText = will?.Draft;
-            if (will.Beneficiaries != null)
-            {
-                SelectedIds.Clear();
-                Percentages.Clear();
-                foreach (var b in will.Beneficiaries)
-                {
-                    SelectedIds.Add(b.BeneficiaryId);
-                    Percentages[b.BeneficiaryId] = b.Percentage;
-                }
-            }
-            
-        }
-        StateHasChanged();
-    }
-    private bool IsSelected(long id) => SelectedIds.Contains(id);
-
-    private void ToggleSelection(long id, bool selected)
-    {
-        if (selected)
-        {
-            SelectedIds.Add(id);
-            if (!Percentages.ContainsKey(id))
-                Percentages[id] = 0m;
-        }
-        else
-        {
-            SelectedIds.Remove(id);
-            Percentages.Remove(id);
-        }
-    }
-
-    private decimal GetPercentage(long id) => Percentages.TryGetValue(id, out var v) ? v : 0m;
-
-    private void OnPercentageInputChanged(long id, ChangeEventArgs e)
-    {
-        if (!SelectedIds.Contains(id))
+            Snackbar.Add("User not available.", Severity.Error);
             return;
-
-        if (decimal.TryParse(e.Value?.ToString(), out var value))
-        {
-            if (value < 0) value = 0;
-            if (value > 100) value = 100;
-            Percentages[id] = Math.Round(value, 2);
-        }
-        else
-        {
-            Percentages[id] = 0m;
         }
 
-        StateHasChanged();
-    }
-
-    private decimal TotalPercentage => Percentages.Values.Sum();
-
-    private void DistributeEqually()
-    {
-
+        isProcessing = true;
         Loader.IsLoading = true;
-        if (!SelectedIds.Any())
+
+        var payload = new WillCreateRequestDto
         {
-            ErrorMessage = "No beneficiaries selected to distribute percentages.";
-            SuccessMessage = string.Empty;
-            return;
-        }
+            Username = AuthService.Email,
+            InstitutionName = InstitutionName,
+            InstitutionAddress = InstitutionAddress,
+            ContactName = ContactName,
+            ContactRole = ContactRole,
+            ContactPhone = ContactPhone,
+            ContactEmail = ContactEmail,
+            Notes = Notes,
+            Id = WillId
+        };
 
-        ErrorMessage = string.Empty;
-        SuccessMessage = string.Empty;
-
-        var count = SelectedIds.Count;
-        var baseShare = Math.Floor(100m / count);
-        var remainder = 100m - (baseShare * count);
-
-        foreach (var id in SelectedIds)
-            Percentages[id] = baseShare;
-
-        // distribute remainder (1% at a time)
-        foreach (var id in SelectedIds)
-        {
-            if (remainder <= 0) break;
-            Percentages[id] += 1;
-            remainder -= 1;
-        }
-        Loader.IsLoading = false;
-        StateHasChanged();
-    }
-
-    private async Task SaveWillAsync()
-    {
         try
         {
-            Loader.IsLoading = true;
-
-            ErrorMessage = string.Empty;
-            SuccessMessage = string.Empty;
-
-            if (!SelectedIds.Any())
-            {
-                ErrorMessage = "Please select at least one beneficiary.";
-                Loader.IsLoading = false;
-                return;
-            }
-
-            if (TotalPercentage != 100m)
-            {
-                ErrorMessage = "Total percentage must equal 100% before saving.";
-                Loader.IsLoading = false;
-                return;
-            }
-
-            var willPayload = new WillCreateRequestDto
-            {
-                Draft = DraftText,
-                Beneficiaries = SelectedIds.Select(id => new WillBeneficiaries
-                {
-                    Beneficiaryid = id,
-                    Percentage = Percentages.TryGetValue(id, out var p) ? p : 0m
-                }).ToList(),
-
-                Username = AuthService.Email
-            };
-
-            var willId = VaultService.CreateUpdateWill(willPayload);
-
-            Loader.IsLoading = false;
+            var id = await VaultService.CreateUpdateWill(payload);
+            HasSavedWill = true;
+            Snackbar.Add("Will saved.", Severity.Success);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Snackbar.Add("Error occurred while saving will.", Severity.Error);
+        }
+        finally
+        {
+            isProcessing = false;
             Loader.IsLoading = false;
-            throw;
+            StateHasChanged();
         }
     }
+
     public void Dispose()
     {
         Loader.OnChange -= StateHasChanged;
-    }
-}
+    } 
+   }

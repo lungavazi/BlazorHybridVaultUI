@@ -98,6 +98,7 @@
                 InsuranceNo = model.InsuranceNo
             };
             await VaultService.UpdateInsuranceAsync(model.Id, policyUpdate);
+            Snackbar.Add(model.Id > 0 ? "Policy saved successfully" : "Error occurred.", model.Id > 0 ? Severity.Success : Severity.Error);
         }
         else
         {
@@ -114,7 +115,7 @@
             var insuranceId = await VaultService.CreateInsuranceAsync(policyDto);
             model.Id = insuranceId;
             model = insuranceId > 0 ? model : new PolicyModel();
-            Snackbar.Add(insuranceId > 0 ? "Policy created successfully" : "Error occurred.");
+            Snackbar.Add(insuranceId > 0 ? "Policy created successfully" : "Error occurred.", insuranceId > 0 ? Severity.Success : Severity.Error);
         }
         MudDialog?.Close(DialogResult.Ok(new PolicyDto { Id = model.Id, DateOpened = model.DateOpened, InsuranceNo = model.InsuranceNo, InsuranceType = model.InsuranceType, Name = model.Name, BeneficiaryIds = selected }));
     }

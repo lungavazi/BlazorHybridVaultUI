@@ -97,6 +97,7 @@
                 DateOpened = model.DateOpened
             };
             await VaultService.UpdateAccountAsync(model.Id, accountUpdate);
+            Snackbar.Add(model.Id > 0 ? "Account saved successfully" : "Error occurred.", model.Id > 0 ? Severity.Success : Severity.Error);
         }
         else
         {
@@ -111,7 +112,7 @@
             };
             var accoundId = await VaultService.CreateAccountAsync(accountDto);
             model = accoundId > 0 ? model : new AccountModel();
-            Snackbar.Add(accoundId > 0 ? "Account created successfully" : "Error occurred.");
+            Snackbar.Add(accoundId > 0 ? "Account created successfully" : "Error occurred.", accoundId > 0 ? Severity.Success : Severity.Error);
         }
         MudDialog?.Close(DialogResult.Ok(new AccountDto { AccountNo = model.AccountNo, AccountType = model.AccountType, DateOpened = model.DateOpened, Id = model.Id, Name = model.Name, BeneficiaryIds=selected}));
     }

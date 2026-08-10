@@ -50,7 +50,6 @@
 @code {
     private MudMessageBox _mudMessageBox;
 
-
     public async Task EditBeneficiary(BeneficiaryDto policy)
     {
         var parameters = new DialogParameters
@@ -115,7 +114,6 @@
         catch (Exception ex)
         {
             Loader.IsLoading = false;
-            // throw;
         }
     }
     private async Task RefreshBenefeciaries()

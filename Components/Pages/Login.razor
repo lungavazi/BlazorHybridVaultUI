@@ -128,7 +128,6 @@
                 return;
             }
 
-            // Store the user + set the JWT on the HTTP client
             AuthService.SetUser(result);
 
             Navigation.NavigateTo("/dashboard", replace: true);
