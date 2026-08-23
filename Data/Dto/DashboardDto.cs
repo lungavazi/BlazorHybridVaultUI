@@ -10,7 +10,7 @@ namespace VaultUI.Data.Dto
         public int BeneficiaryCount { get; set; }
         [JsonPropertyName("policyCount")]
         public int PolicyCount { get; set; }
-        [JsonPropertyName("othertCount")]
+        [JsonPropertyName("otherCount")]
         public int OtherCount { get; set; }
     }
 }

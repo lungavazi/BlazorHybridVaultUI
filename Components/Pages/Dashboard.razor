@@ -3,13 +3,15 @@
 @inject VaultService VaultService
 @inject LoadingService Loader
 @inject AuthService AuthService
+@inject VaultUI.Services.TabService TabService
+
 <div class="dashboard-scroll-container">
 	<MudContainer MaxWidth="MaxWidth.Medium">
 	<MudPaper Class="pa-4">
             <MudGrid>
 				<MudItem xs="12">
 					<MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
-						<MudFab StartIcon="@Icons.Material.Filled.NotificationsActive" Label="Activate Monitoring" Color="Color.Tertiary" />
+						<MudFab StartIcon="@Icons.Material.Filled.NotificationsActive" Label="Activate Monitoring" Color="Color.Tertiary" OnClick="ActivateMonitoring" />
 					</MudPaper>
                     <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
                         <MudAlert Severity="Severity.Warning" ContentAlignment="HorizontalAlignment.Start">
@@ -25,6 +27,9 @@
 				         Class="stat-card"
 						 Style="color:burlywood">
 					<MudCardHeader>
+							<CardHeaderActions>
+								<MudIconButton Icon="fas fa-share-square" Color="Color.Error" OnClick="OpenPolicies"/>
+							</CardHeaderActions>
 						<CardHeaderContent>
 							<MudIcon Icon="@Icons.Material.Filled.Policy"/>
 								<MudText Typo="Typo.h6">Insurance Policies</MudText>
@@ -40,7 +45,10 @@
             <MudItem xs="12">
 				<MudCard Class="stat-card"
 				         Style="color:cornflowerblue">
-					<MudCardHeader>
+						<MudCardHeader>
+							<CardHeaderActions>
+								<MudIconButton Icon="fas fa-share-square" Color="Color.Error" OnClick="OpenAccount" />
+							</CardHeaderActions>
 						<CardHeaderContent>
 								<MudIcon Icon="@Icons.Material.Filled.AccountBalance" />
 								<MudText Typo="Typo.h6">Bank & Accounts</MudText>
@@ -56,7 +64,10 @@
             <MudItem xs="12">
 				<MudCard Class="stat-card"
 				         Style="color:cadetblue">
-					<MudCardHeader>
+						<MudCardHeader>
+							<CardHeaderActions>
+								<MudIconButton Icon="fas fa-share-square" Color="Color.Error" OnClick="OpenBeneficiary" />
+							</CardHeaderActions>
 						<CardHeaderContent>
 							<MudIcon Icon="@Icons.Material.Filled.People"/>
 								<MudText Typo="Typo.h6">Beneficiaries</MudText>
@@ -74,7 +85,10 @@
             <MudItem xs="12">
 				<MudCard Class="stat-card"
 				         Style="color:burlywood">
-					<MudCardHeader>
+						<MudCardHeader>
+							<CardHeaderActions>
+								<MudIconButton Icon="fas fa-share-square" Color="Color.Error" OnClick="OpenWill" />
+							</CardHeaderActions>
 						<CardHeaderContent>
 							<MudIcon Icon="@Icons.Material.Filled.Drafts"/>
 								<MudText Typo="Typo.h6">Wills & Estate</MudText>
@@ -110,7 +124,6 @@
 	private bool _visible;
 	private readonly DialogOptions _dialogOptions = new() { FullWidth = true };
 
-
 	private void ResyncStatus() => _visible = true;
 
 	private void Cancel() => _visible = false;
@@ -123,6 +136,28 @@
 
 	Color badgeColor = Color.Warning;
 	private string LastStatusText = Constants.LastStatusText;
+
+	private void ActivateMonitoring()
+	{
+		TabService.OpenTab(5);
+	}
+	private void OpenPolicies()
+	{
+		TabService.OpenTab(1);
+    }
+	private void OpenWill()
+    {
+        TabService.OpenTab(4);
+    }
+	private void OpenBeneficiary()
+    {
+        TabService.OpenTab(3);
+    }
+	private void OpenAccount()
+    {
+        TabService.OpenTab(2);
+    }
+
 	protected override async Task OnInitializedAsync()
 	{
 		try

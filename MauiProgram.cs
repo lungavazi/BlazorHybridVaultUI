@@ -35,6 +35,7 @@ namespace VaultUI
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddSingleton<LoadingService>();
             builder.Services.AddSingleton<AuthService>();
+            builder.Services.AddSingleton<TabService>(); 
             builder.Services.AddTransient<AuthHeaderHandler>();
             builder.Services.AddHttpClient<ApiClient>(client =>
             {
@@ -44,8 +45,8 @@ namespace VaultUI
             builder.Services.AddScoped<VaultService>();
 
 #if DEBUG
-            builder.Services.AddBlazorWebViewDeveloperTools();
-    		builder.Logging.AddDebug();
+                builder.Services.AddBlazorWebViewDeveloperTools();
+        		builder.Logging.AddDebug();
 #endif
 
             return builder.Build();

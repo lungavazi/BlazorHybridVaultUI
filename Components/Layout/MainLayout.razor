@@ -2,6 +2,7 @@
 @inject LoadingService Loader
 @inject AuthService AuthService
 @inject NavigationManager Navigation
+@inject VaultUI.Services.TabService TabService
 @implements IDisposable
 
 <MudThemeProvider />
@@ -40,7 +41,7 @@ else
         <MudDrawer @bind-Open="@_drawerOpen" Variant="DrawerVariant.Temporary">
             <Profile />
         </MudDrawer>
-        <MudTabs Position="Position.Bottom" Rounded="false" MinimumTabWidth="60px" Elevation="0" PanelClass="pa-0" SliderColor="Color.Tertiary">
+        <MudTabs @ref="_tabs" @bind-ActivePanelIndex="_activeIndex" Position="Position.Bottom" Rounded="false" MinimumTabWidth="60px" Elevation="0" PanelClass="pa-0" SliderColor="Color.Tertiary">
             <MudTabPanel Icon="@Icons.Material.Filled.Dashboard" IconColor="Color.Tertiary">
                 <Dashboard />
             </MudTabPanel>
@@ -65,6 +66,8 @@ else
 
 @code {
     bool _drawerOpen = false;
+    private MudTabs? _tabs;
+    private int _activeIndex = 0;
 
     private void DrawerToggle(MouseEventArgs args) => _drawerOpen = !_drawerOpen;
 
@@ -80,8 +83,16 @@ else
         AuthService.OnAuthStateChanged += StateHasChanged;
         AuthService.OnSubscriptionChanged += StateHasChanged;
 
+        TabService.OnTabRequested += HandleTabRequest;
+
         if (!AuthService.IsAuthenticated)
             Navigation.NavigateTo("/login", replace: true);
+    }
+
+    private void HandleTabRequest(int idx)
+    {
+        _activeIndex = idx;
+        StateHasChanged();
     }
 
     public void Dispose()
@@ -89,5 +100,6 @@ else
         Loader.OnChange -= StateHasChanged;
         AuthService.OnAuthStateChanged -= StateHasChanged;
         AuthService.OnSubscriptionChanged -= StateHasChanged;
+        TabService.OnTabRequested -= HandleTabRequest;
     }
 }
