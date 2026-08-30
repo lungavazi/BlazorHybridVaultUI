@@ -1,0 +1,27 @@
+@inject AuthService AuthService
+@inject VaultUI.Services.TabService TabService
+
+@if (AuthService.IsSubscribed)
+{
+    @ChildContent
+}
+else
+{
+    <MudAlert Severity="Severity.Warning" Class="my-2">
+        <MudText>@Message</MudText>
+        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="GoToSubscription">
+            Subscribe Now
+        </MudButton>
+    </MudAlert>
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Message { get; set; } = "This feature requires an active subscription.";
+
+    private void GoToSubscription()
+    {
+        // Navigate to Subscription tab (index 5)
+        TabService.OpenTab(5);
+    }
+}

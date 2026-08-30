@@ -3,12 +3,21 @@
 @inject LoadingService Loader
 @inject VaultService VaultService
 @inject AuthService AuthService
+@inject VaultUI.Services.SubscriptionGuard SubscriptionGuard
 
 <div class="dashboard-scroll-container">
 <MudContainer MaxWidth="MaxWidth.Medium">
        <MudPaper>
-        <MudIconButton Icon="fas fa-plus" Color="Color.Tertiary"
-                       Onclick="AddPolicyAsync" />
+        @if (AuthService.IsSubscribed)
+        {
+            <MudIconButton Icon="fas fa-plus" Color="Color.Tertiary"
+                           Onclick="AddPolicyAsync" />
+        }
+        else
+        {
+            <MudIconButton Icon="fas fa-plus" Color="Color.Default" Disabled="true"
+                           Title="Subscription required to add policies" />
+        }
         <MudText Typo="Typo.h5">Policies</MudText>
         <MudTextField @bind-Value="searchString"
                           Placeholder="Search All insurance Policies"
@@ -24,12 +33,15 @@
                     OnClick="@(() => EditPolicy(policy))">
                         <MudHighlighter Text="@policy.Name"
                         HighlightedText="@searchString" />
-                        <MudMenu Icon="@Icons.Material.Filled.Settings"
-                                 Color="Color.Tertiary">
-                            <MudMenuItem Label="Remove"
-                                         Icon="@Icons.Material.Filled.Delete"
-                                         OnClick="@(() => DeleteInsuranceAsync(policy.Id))" />
-                        </MudMenu>
+                        @if (AuthService.IsSubscribed)
+                        {
+                            <MudMenu Icon="@Icons.Material.Filled.Settings"
+                                     Color="Color.Tertiary">
+                                <MudMenuItem Label="Remove"
+                                             Icon="@Icons.Material.Filled.Delete"
+                                             OnClick="@(() => DeleteInsuranceAsync(policy.Id))" />
+                            </MudMenu>
+                        }
                         <MudText Typo="Typo.body2">
                             @policy.InsuranceType
                         </MudText>
@@ -50,6 +62,7 @@
 @code {
     private MudMessageBox _mudMessageBox;
     string searchString;
+    
     private async Task HandleKeyDownAsync(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
@@ -57,12 +70,17 @@
             await RefreshPolicies();
         }
     }
+
     public async Task EditPolicy(PolicyDto policy)
     {
+        // Guard: require subscription to edit
+        if (!SubscriptionGuard.CanAccess())
+            return;
+
         var parameters = new DialogParameters
-            {
-                ["PolicyEditDto"] = policy,
-            };
+        {
+            ["PolicyEditDto"] = policy,
+        };
 
         var options = new DialogOptions() { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center };
         var dialog = await DialogService.ShowAsync<Policy>("Edit Policy", parameters, options);
@@ -72,42 +90,52 @@
         {
             if (result.Data is PolicyDto data)
             {
-                PoliciesDto[data.Id]= data;
+                PoliciesDto[data.Id] = data;
             }
         }
-
     }
+
     public async Task DeleteInsuranceAsync(long id)
     {
+        // Guard: require subscription to delete
+        if (!SubscriptionGuard.CanAccess())
+            return;
+
         bool? result = await _mudMessageBox.ShowAsync();
-        if( result is not null && result == true )
+        if (result is not null && result == true)
         {
             await VaultService.DeleteInsuranceAsync(id);
             PoliciesDto.Remove(id);
         }
     }
+
     public async Task AddPolicyAsync()
     {
+        // Guard: require subscription to add
+        if (!SubscriptionGuard.CanAccess())
+            return;
+
         var options = new DialogOptions() { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center };
         var dialog = await DialogService.ShowAsync<Policy>("Add Policy", options);
         var result = await dialog.Result;
 
         if (!result.Canceled)
         {
-            if(result.Data is PolicyDto data)
+            if (result.Data is PolicyDto data)
             {
                 PoliciesDto.Add(data.Id, data);
-            }   
+            }
         }
     }
+
     public Dictionary<long, PolicyDto> PoliciesDto = new();
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
             Loader.IsLoading = true;
             await RefreshPolicies();
-
             Loader.IsLoading = false;
         }
         catch (Exception ex)
@@ -126,4 +154,4 @@
         var policies = await VaultService.GetPoliciesAsync(AuthService.Email ?? string.Empty, searchString);
         PoliciesDto = policies.ToDictionary(p => p.Id);
     }
-    }
+}

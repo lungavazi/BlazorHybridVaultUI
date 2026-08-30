@@ -43,6 +43,7 @@ namespace VaultUI
             }).AddHttpMessageHandler<AuthHeaderHandler>();
             builder.Services.AddScoped<IVaultRepository, VaultRepository>();
             builder.Services.AddScoped<VaultService>();
+            builder.Services.AddScoped<SubscriptionGuard>();
 
 #if DEBUG
                 builder.Services.AddBlazorWebViewDeveloperTools();
