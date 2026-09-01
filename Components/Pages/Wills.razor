@@ -3,11 +3,24 @@
 @inject AuthService AuthService
 @inject VaultService VaultService
 @inject ISnackbar Snackbar
+@inject VaultUI.Services.SubscriptionLimitsService SubscriptionLimits
 
 <div class="dashboard-scroll-container">
     <MudContainer MaxWidth="MaxWidth.Medium">
         <MudPaper Class="pa-4">
-            <MudText Typo="Typo.h5" Class="mb-2">Will — Institution & Contact</MudText>
+            <!-- Header Section -->
+            <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center" Class="mb-3">
+                <div>
+                    <MudText Typo="Typo.h5">Will — Institution & Contact</MudText>
+                    @if (!AuthService.IsSubscribed && HasSavedWill)
+                    {
+                        <MudText Typo="Typo.caption" Color="Color.Warning">
+                            Free Trial: Limited to 1 will entry
+                        </MudText>
+                    }
+                </div>
+                <MudSpacer />
+            </MudStack>
 
             <MudGrid Spacing="3">
                 <MudItem xs="12" md="6">
@@ -30,11 +43,18 @@
                         <MudTextField @bind-Value="Notes" Label="Notes" Lines="6" TextArea="true" FullWidth="true" Class="mt-3" />
 
                         <div class="mt-3 d-flex">
-                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveWillAsync" Disabled="isProcessing">
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveWillAsync" Disabled="@(isProcessing || (!AuthService.IsSubscribed && HasSavedWill))">
                                 @(isProcessing ? "Saving..." : "Save")
                             </MudButton>
                             <MudButton Variant="Variant.Outlined" Class="ml-2" OnClick="ClearForm" Disabled="isProcessing">Clear</MudButton>
                         </div>
+
+                        <!-- Upgrade Prompt for Free Users -->
+                        @if (!AuthService.IsSubscribed && HasSavedWill)
+                        {
+                            <UpgradePrompt Title="Unlock Will Updates"
+                                          Message="You've saved 1 will entry. Upgrade your subscription to modify it or save multiple entries." />
+                        }
 
                         @if (!string.IsNullOrEmpty(ErrorMessage))
                         {
@@ -76,6 +96,13 @@
                                     <MudText Typo="Typo.body2">@Notes</MudText>
                                 </MudListItem>
                             </MudList>
+
+                            @if (AuthService.IsSubscribed)
+                            {
+                                <MudButton Variant="Variant.Text" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" OnClick="DeleteWillAsync" Class="mt-2">
+                                    Delete Will
+                                </MudButton>
+                            }
                         }
                         else
                         {
@@ -163,42 +190,96 @@
             return;
         }
 
+        // Check subscription for free users trying to save new/update will
+        if (!AuthService.IsSubscribed && HasSavedWill)
+        {
+            Snackbar.Add(SubscriptionLimits.GetUpgradeMessage("Wills"), Severity.Warning);
+            return;
+        }
+
         isProcessing = true;
         Loader.IsLoading = true;
 
-        var payload = new WillCreateRequestDto
-        {
-            Username = AuthService.Email,
-            InstitutionName = InstitutionName,
-            InstitutionAddress = InstitutionAddress,
-            ContactName = ContactName,
-            ContactRole = ContactRole,
-            ContactPhone = ContactPhone,
-            ContactEmail = ContactEmail,
-            Notes = Notes,
-            Id = WillId
-        };
-
         try
         {
-            var id = await VaultService.CreateUpdateWill(payload);
-            HasSavedWill = true;
-            Snackbar.Add("Will saved.", Severity.Success);
+            var dto = new WillCreateRequestDto
+            {
+                Id = WillId,
+                Username = AuthService.Email,
+                InstitutionName = InstitutionName,
+                InstitutionAddress = InstitutionAddress,
+                ContactName = ContactName,
+                ContactRole = ContactRole,
+                ContactPhone = ContactPhone,
+                ContactEmail = ContactEmail,
+                Notes = Notes
+            };
+
+            long result;
+            if (WillId == 0)
+            {
+                result = await VaultService.CreateUpdateWill(dto);
+            }
+            else
+            {
+                result = await VaultService.CreateUpdateWill(dto);
+            }
+
+            if (result > 0)
+            {
+                WillId = result;
+                HasSavedWill = true;
+                SuccessMessage = "Will saved successfully!";
+                Snackbar.Add(SuccessMessage, Severity.Success);
+            }
+            else
+            {
+                ErrorMessage = "Failed to save will.";
+            }
         }
         catch (Exception ex)
         {
-            Snackbar.Add("Error occurred while saving will.", Severity.Error);
+            ErrorMessage = $"Error: {ex.Message}";
+            Snackbar.Add(ErrorMessage, Severity.Error);
         }
         finally
         {
             isProcessing = false;
             Loader.IsLoading = false;
-            StateHasChanged();
         }
+    }
+
+    async Task DeleteWillAsync()
+    {
+        // if (WillId == 0)
+        // {
+        //     Snackbar.Add("No will to delete.", Severity.Warning);
+        //     return;
+        // }
+
+        // isProcessing = true;
+        // try
+        // {
+        //     await VaultService.de(WillId);
+        //     WillId = 0;
+        //     HasSavedWill = false;
+        //     ClearForm();
+        //     SuccessMessage = "Will deleted successfully!";
+        //     Snackbar.Add(SuccessMessage, Severity.Success);
+        // }
+        // catch (Exception ex)
+        // {
+        //     ErrorMessage = $"Error deleting will: {ex.Message}";
+        //     Snackbar.Add(ErrorMessage, Severity.Error);
+        // }
+        // finally
+        // {
+        //     isProcessing = false;
+        // }
     }
 
     public void Dispose()
     {
         Loader.OnChange -= StateHasChanged;
-    } 
-   }
+    }
+}

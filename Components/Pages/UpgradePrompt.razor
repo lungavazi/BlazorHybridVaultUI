@@ -1,0 +1,28 @@
+@inject VaultUI.Services.TabService TabService
+
+<MudAlert Severity="Severity.Info" Class="my-3" Icon="@Icons.Material.Filled.LockOpen">
+    <MudStack Spacing="1">
+        <MudText Typo="Typo.body2">
+            <strong>@Title</strong>
+        </MudText>
+        <MudText Typo="Typo.caption">
+            @Message
+        </MudText>
+        <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" 
+                   StartIcon="@Icons.Material.Filled.Subscriptions"
+                   OnClick="GoToSubscription" Class="mt-1">
+            Upgrade Now
+        </MudButton>
+    </MudStack>
+</MudAlert>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Unlock Unlimited Access";
+    [Parameter] public string Message { get; set; } = "Subscribe to add unlimited items.";
+
+    private void GoToSubscription()
+    {
+        // Navigate to Subscription tab (index 5)
+        TabService.OpenTab(5);
+    }
+}

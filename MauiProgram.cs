@@ -44,6 +44,7 @@ namespace VaultUI
             builder.Services.AddScoped<IVaultRepository, VaultRepository>();
             builder.Services.AddScoped<VaultService>();
             builder.Services.AddScoped<SubscriptionGuard>();
+            builder.Services.AddScoped<SubscriptionLimitsService>();
 
 #if DEBUG
                 builder.Services.AddBlazorWebViewDeveloperTools();
