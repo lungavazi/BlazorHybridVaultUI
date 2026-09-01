@@ -1,7 +1,9 @@
 @page "/login"
+@using Microsoft.AspNetCore.Components
 @inject VaultService VaultService
 @inject AuthService AuthService
 @inject NavigationManager Navigation
+@inject MudBlazor.ISnackbar Snackbar
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center justify-center" Style="min-height: 100vh;">
     <MudPaper Class="pa-8 ma-4" Elevation="4" Style="width: 100%;">
@@ -25,44 +27,46 @@
             </MudAlert>
         }
 
-        <MudTextField @bind-Value="_email"
-                      Label="Email"
-                      Variant="Variant.Outlined"
-                      InputType="InputType.Email"
-                      Adornment="Adornment.Start"
-                      AdornmentIcon="@Icons.Material.Filled.Email"
-                      FullWidth="true"
-                      Class="mb-4"
-                      Disabled="_isLoading" />
+        <form @onsubmit="HandleSubmit">
+            <MudTextField @bind-Value="_email"
+                          Label="Email"
+                          Variant="Variant.Outlined"
+                          InputType="InputType.Email"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Email"
+                          FullWidth="true"
+                          Class="mb-4"
+                          Disabled="_isLoading" />
 
-        <MudTextField @bind-Value="_password"
-                      Label="Password"
-                      Variant="Variant.Outlined"
-                      InputType="@_passwordInputType"
-                      Adornment="Adornment.End"
-                      AdornmentIcon="@_passwordIcon"
-                      OnAdornmentClick="TogglePasswordVisibility"
-                      FullWidth="true"
-                      Class="mb-6"
-                      Disabled="_isLoading"
-                      OnKeyDown="HandleKeyDown" />
+            <MudTextField @bind-Value="_password"
+                          Label="Password"
+                          Variant="Variant.Outlined"
+                          InputType="@_passwordInputType"
+                          Adornment="Adornment.End"
+                          AdornmentIcon="@_passwordIcon"
+                          OnAdornmentClick="TogglePasswordVisibility"
+                          FullWidth="true"
+                          Class="mb-6"
+                          Disabled="_isLoading" />
 
-        <MudButton Variant="Variant.Filled"
-                   Color="Color.Tertiary"
-                   FullWidth="true"
-                   Size="Size.Large"
-                   OnClick="LoginAsync"
-                   Disabled="_isLoading">
-            @if (_isLoading)
-            {
-                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
-                <span>Signing in...</span>
-            }
-            else
-            {
-                <span>Sign In</span>
-            }
-        </MudButton>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Tertiary"
+                       FullWidth="true"
+                       Size="Size.Large"
+                       ButtonType="ButtonType.Submit"
+                       OnClick="LoginAsync"
+                       Disabled="_isLoading">
+                @if (_isLoading)
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                    <span>Signing in...</span>
+                }
+                else
+                {
+                    <span>Sign In</span>
+                }
+            </MudButton>
+        </form>
 
         <MudText Align="Align.Center" Typo="Typo.body2" Class="mt-4">
             Don't have an account?
@@ -86,17 +90,32 @@
         ? Icons.Material.Filled.VisibilityOff
         : Icons.Material.Filled.Visibility;
 
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "username")]
+    public string? UsernameQuery { get; set; }
+
     protected override void OnInitialized()
     {
         if (AuthService.IsAuthenticated)
             Navigation.NavigateTo("/dashboard", replace: true);
     }
 
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrWhiteSpace(UsernameQuery))
+        {
+            _email = UsernameQuery;
+            // show snackbar to inform the user they registered successfully
+            Snackbar.Add("User successfully registered.", MudBlazor.Severity.Success);
+        }
+    }
+
     private void TogglePasswordVisibility() => _showPassword = !_showPassword;
 
-    private async Task HandleKeyDown(KeyboardEventArgs e)
+    private async Task HandleSubmit()
     {
-        if (e.Key == "Enter")
+        // Prevent duplicate work if button click also calls LoginAsync
+        if (!_isLoading)
             await LoginAsync();
     }
 

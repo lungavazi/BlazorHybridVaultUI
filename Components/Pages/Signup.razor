@@ -237,7 +237,9 @@
 
             _successMessage = "Account created successfully! Redirecting to login...";
             await Task.Delay(2000);
-            Navigation.NavigateTo("/login", replace: true);
+
+            // Navigate to login and include username so login page can autofill
+            Navigation.NavigateTo($"/login?username={Uri.EscapeDataString(_username.Trim())}", replace: true);
         }
         catch (Exception)
         {
